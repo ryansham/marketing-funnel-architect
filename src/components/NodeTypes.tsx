@@ -1,11 +1,10 @@
 import React, { memo, useMemo } from 'react';
-import { Handle, Position, NodeResizer } from 'reactflow';
+import { Handle, Position, NodeResizer, BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '../lib/utils';
 import { NodeType, MockupModule } from '../types';
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
-import { BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow';
 
 import { useStore } from '../store/useStore';
 
@@ -726,11 +725,10 @@ export const CustomEdge = memo(({
   const isHighlighted = !!selectedNodeId && (source === selectedNodeId || target === selectedNodeId);
   const isDimmed       = !!selectedNodeId && !isHighlighted && !selected;
 
-  // SmoothStep for professional flowchart routing
-  const [edgePath, labelX, labelY] = getSmoothStepPath({
+  // Bezier routing — reliable across all ReactFlow 11 versions
+  const [edgePath, labelX, labelY] = getBezierPath({
     sourceX, sourceY, sourcePosition,
     targetX, targetY, targetPosition,
-    borderRadius: 12,
   });
 
   const edgeColor = isHighlighted
