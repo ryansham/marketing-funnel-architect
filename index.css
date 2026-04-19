@@ -1,0 +1,183 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Dancing+Script&family=Caveat&family=Sacramento&family=Pacifico&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Montserrat", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-accent: #38bdf8;
+  --color-discovery: #3b82f6;
+  --color-direct: #22c55e;
+  --color-owned: #a855f7;
+  --color-physical: #f97316;
+}
+
+:root {
+  --bg: #f8fafc;
+  --sidebar: #ffffff;
+  --accent: #38bdf8;
+  --discovery: #3b82f6;
+  --direct: #22c55e;
+  --owned: #a855f7;
+  --physical: #f97316;
+  --text-main: #0f172a;
+  --text-dim: #64748b;
+  --border: #e2e8f0;
+}
+
+.dark {
+  --bg: #020617;
+  --sidebar: #0f172a;
+  --text-main: #f8fafc;
+  --text-dim: #94a3b8;
+  --border: #1e293b;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-main);
+  @apply antialiased font-sans transition-colors duration-500;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  @apply rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+
+/* ── GROUP NODE: let clicks pass through to children ─────────────────────────
+   ReactFlow wraps every node in its own div with pointer-events:all.
+   We override that wrapper for group nodes so clicks reach child cards.       */
+.react-flow__node-group {
+  pointer-events: none !important;
+}
+/* Re-enable only the label badge so it's still clickable/draggable */
+.react-flow__node-group > div > div {
+  pointer-events: all;
+}
+
+/* ── HANDLES: always visible but subtle; glow on hover ───────────────────────*/
+.react-flow__handle {
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  border: 2px solid white !important;
+  background-color: var(--accent) !important;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s !important;
+}
+
+/* Show handles when the node is hovered OR selected */
+.react-flow__node:hover .react-flow__handle,
+.react-flow__node.selected .react-flow__handle {
+  opacity: 1;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.4) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent) !important;
+}
+
+/* ── EDGES: solid lines, visible arrows ──────────────────────────────────────*/
+.react-flow__edge-path {
+  stroke-width: 1.5px !important;
+  stroke: #94a3b8;
+}
+
+.react-flow__edge.selected .react-flow__edge-path,
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: var(--accent) !important;
+  stroke-width: 2px !important;
+}
+
+/* Remove dashes from animated edges — use solid lines instead */
+.react-flow__edge-path {
+  stroke-dasharray: none !important;
+  animation: none !important;
+}
+
+/* ── NODES: smooth hover lift ────────────────────────────────────────────────*/
+.react-flow__node-marketing,
+.react-flow__node-landing {
+  transition: filter 0.2s, transform 0.15s;
+}
+
+.react-flow__node-marketing:hover,
+.react-flow__node-landing:hover {
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12));
+}
+
+/* ── SELECTION BOX ───────────────────────────────────────────────────────────*/
+.react-flow__nodeselection-rect,
+.react-flow__selection {
+  @apply bg-accent/10 border-accent rounded-xl pointer-events-none;
+  border-style: dashed !important;
+}
+
+/* ── CONTROLS ─────────────────────────────────────────────────────────────────*/
+.react-flow__controls-button {
+  background-color: var(--sidebar);
+  border-color: var(--border);
+  @apply border-t-0 first:border-t transition-colors;
+}
+
+.react-flow__attribution {
+  display: none !important;
+}
+
+/* ── REACT QUILL ─────────────────────────────────────────────────────────────*/
+.ql-container.ql-snow {
+  border: none !important;
+  font-family: inherit !important;
+  background: transparent !important;
+}
+
+.ql-editor {
+  padding: 8px !important;
+  color: inherit !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+.ql-editor.ql-blank::before {
+  color: var(--text-dim) !important;
+  opacity: 0.5 !important;
+  font-style: italic !important;
+}
+
+.light .rich-editor-canvas .ql-editor.ql-blank::before {
+  color: #000000 !important;
+  opacity: 1 !important;
+  font-style: normal !important;
+}
+
+.rich-editor-canvas .ql-editor {
+  height: 100% !important;
+}
+
+/* ── EXPORT VIEW ─────────────────────────────────────────────────────────────*/
+.is-exporting .react-flow__handle,
+.is-exporting .react-flow__node-resizer,
+.is-exporting .react-flow__nodesselection-rect,
+.is-exporting .react-flow__panel {
+  display: none !important;
+}
+
+.is-exporting .react-flow__node {
+  box-shadow: none !important;
+}
