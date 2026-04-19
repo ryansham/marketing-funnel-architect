@@ -159,7 +159,6 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
 
   return (
     <div
-      onClick={() => bringToFront(id)}
       className={cn(
         'border transition-all duration-200 relative group/card cursor-pointer',
         isDiscovery ? 'rounded-full px-6 py-3' : 'rounded-xl',
@@ -613,12 +612,16 @@ export const GroupNode = memo(({ id, data, selected }: any) => {
   const theme          = useStore((s) => s.theme);
 
   return (
-    <div className={cn('w-full h-full border-2 rounded-2xl relative group transition-all', theme === 'dark' ? 'bg-white/[0.02] border-white/10' : 'bg-slate-100/50 border-slate-300', selected ? 'border-accent ring-2 ring-accent/20' : 'border-dashed hover:border-accent/40')}>
-      <div className="absolute -top-3 left-4 px-2 bg-accent rounded text-[8px] font-black uppercase text-bg tracking-widest z-10 flex items-center gap-2">
+    <div
+      className={cn('w-full h-full border-2 rounded-2xl relative group transition-all', theme === 'dark' ? 'bg-white/[0.02] border-white/10' : 'bg-slate-100/50 border-slate-300', selected ? 'border-accent ring-2 ring-accent/20' : 'border-dashed hover:border-accent/40')}
+      style={{ pointerEvents: 'none' }}
+    >
+      {/* Label — re-enable pointer events only for interactive parts */}
+      <div className="absolute -top-3 left-4 px-2 bg-accent rounded text-[8px] font-black uppercase text-bg tracking-widest z-10 flex items-center gap-2" style={{ pointerEvents: 'all' }}>
         <LucideIcons.Layers size={10} />
         {data.label || 'Group'}
       </div>
-      <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity" style={{ pointerEvents: 'all' }}>
         <input className={cn('bg-transparent border-none text-[8px] font-black text-right focus:ring-0 outline-none w-20', theme === 'dark' ? 'text-text-dim/80' : 'text-text-dim')} value={data.label || ''} onChange={(e) => updateNodeData(id, { label: e.target.value })} onPointerDown={(e) => e.stopPropagation()} />
       </div>
     </div>
