@@ -397,22 +397,22 @@ export default function App() {
       id: groupId,
       type: 'group',
       position: basePos,
-      style: { width: 1250, height: 350 },
+      style: { width: 1250, height: 420, pointerEvents: 'none' as unknown as undefined },
       data: { label: 'Social Acquisition Flow', type: 'group' }
     };
 
     const newNodes: any[] = [
       groupNode,
-      { id: fbId, parentId: groupId, extent: 'parent', type: 'marketing', position: { x: 40, y: 100 }, data: { label: 'Facebook Ads', type: 'discovery', primaryChannel: 'facebook', volume: 10000, ctr: 3, cpc: 0.5 } },
-      { id: landingId, parentId: groupId, extent: 'parent', type: 'landing', position: { x: 350, y: 100 }, data: { label: 'Campaign Page', type: 'owned', pageType: 'Static Page', mockupModules: [{ id: 'm1', type: 'Hero', content: {} }, { id: 'm2', type: 'CTA', content: {} }, { id: 'm3', type: 'Subscription', content: {} }] } },
-      { id: formId, parentId: groupId, extent: 'parent', type: 'marketing', position: { x: 650, y: 100 }, data: { label: 'Registration Form', type: 'discovery', primaryChannel: 'form', volume: 0, ctr: 0, cpc: 0 } },
-      { id: emailId, parentId: groupId, extent: 'parent', type: 'marketing', position: { x: 950, y: 100 }, data: { label: 'Email Confirmation', type: 'discovery', primaryChannel: 'email', volume: 0, ctr: 0, cpc: 0 } },
+      { id: fbId, parentId: groupId, extent: 'parent', type: 'marketing', position: { x: 40, y: 160 }, data: { label: 'Facebook Ads', type: 'discovery', primaryChannel: 'facebook', volume: 10000, ctr: 3, cpc: 0.5 } },
+      { id: landingId, parentId: groupId, extent: 'parent', type: 'landing', position: { x: 340, y: 50 }, data: { label: 'Campaign Page', type: 'owned', pageType: 'Static Page', mockupModules: [{ id: 'm1', type: 'Hero', content: {} }, { id: 'm2', type: 'CTA', content: {} }, { id: 'm3', type: 'Subscription', content: {} }] } },
+      { id: formId, parentId: groupId, extent: 'parent', type: 'marketing', position: { x: 650, y: 160 }, data: { label: 'Registration Form', type: 'discovery', primaryChannel: 'form', volume: 0, ctr: 0, cpc: 0 } },
+      { id: emailId, parentId: groupId, extent: 'parent', type: 'marketing', position: { x: 950, y: 160 }, data: { label: 'Email Confirmation', type: 'discovery', primaryChannel: 'email', volume: 0, ctr: 0, cpc: 0 } },
     ];
 
     const newEdges = [
-      { id: `e-${fbId}-${landingId}`, source: fbId, target: landingId, animated: true, type: 'custom' },
-      { id: `e-${landingId}-${formId}`, source: landingId, target: formId, animated: true, type: 'custom' },
-      { id: `e-${formId}-${emailId}`, source: formId, target: emailId, animated: true, type: 'custom' },
+      { id: `e-${fbId}-${landingId}`, source: fbId, target: landingId, type: 'custom' },
+      { id: `e-${landingId}-${formId}`, source: landingId, target: formId, type: 'custom' },
+      { id: `e-${formId}-${emailId}`, source: formId, target: emailId, type: 'custom' },
     ];
 
     setNodes(newNodes);

@@ -60,17 +60,80 @@ body {
   @apply bg-slate-400;
 }
 
-/* React Flow custom styles */
+/* ── GROUP NODE: let clicks pass through to children ─────────────────────────
+   ReactFlow sets pointer-events:all on every node wrapper. For group nodes
+   this blocks clicks to child cards. We override at multiple levels.          */
+.react-flow__node.react-flow__node-group,
+.react-flow__node.react-flow__node-group.selectable,
+.react-flow__node.react-flow__node-group.selected {
+  pointer-events: none !important;
+}
+/* Re-enable label and input inside group */
+.react-flow__node-group > div,
+.react-flow__node-group > div > div,
+.react-flow__node-group input {
+  pointer-events: all !important;
+}
+
+/* ── HANDLES: always visible but subtle; glow on hover ───────────────────────*/
 .react-flow__handle {
-  width: 8px !important;
-  height: 8px !important;
-  @apply border-2 border-white bg-accent;
+  width: 10px !important;
+  height: 10px !important;
+  border-radius: 50% !important;
+  border: 2px solid white !important;
+  background-color: var(--accent) !important;
+  opacity: 0;
+  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s !important;
 }
 
+/* Show handles when the node is hovered OR selected */
+.react-flow__node:hover .react-flow__handle,
+.react-flow__node.selected .react-flow__handle {
+  opacity: 1;
+}
+
+.react-flow__handle:hover {
+  transform: scale(1.4) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent) !important;
+}
+
+/* ── EDGES: solid lines, visible arrows ──────────────────────────────────────*/
 .react-flow__edge-path {
-  @apply stroke-[2px];
+  stroke-width: 1.5px !important;
+  stroke: #94a3b8;
 }
 
+.react-flow__edge.selected .react-flow__edge-path,
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: var(--accent) !important;
+  stroke-width: 2px !important;
+}
+
+/* Remove dashes from animated edges — use solid lines instead */
+.react-flow__edge-path {
+  stroke-dasharray: none !important;
+  animation: none !important;
+}
+
+/* ── NODES: smooth hover lift ────────────────────────────────────────────────*/
+.react-flow__node-marketing,
+.react-flow__node-landing {
+  transition: filter 0.2s, transform 0.15s;
+}
+
+.react-flow__node-marketing:hover,
+.react-flow__node-landing:hover {
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.12));
+}
+
+/* ── SELECTION BOX ───────────────────────────────────────────────────────────*/
+.react-flow__nodeselection-rect,
+.react-flow__selection {
+  @apply bg-accent/10 border-accent rounded-xl pointer-events-none;
+  border-style: dashed !important;
+}
+
+/* ── CONTROLS ─────────────────────────────────────────────────────────────────*/
 .react-flow__controls-button {
   background-color: var(--sidebar);
   border-color: var(--border);
@@ -81,7 +144,7 @@ body {
   display: none !important;
 }
 
-/* React Quill Overrides for Sticky Note */
+/* ── REACT QUILL ─────────────────────────────────────────────────────────────*/
 .ql-container.ql-snow {
   border: none !important;
   font-family: inherit !important;
@@ -111,11 +174,7 @@ body {
   height: 100% !important;
 }
 
-.react-flow__nodeselection-rect, .react-flow__selection {
-  @apply bg-accent/20 border-accent rounded-xl pointer-events-none;
-}
-
-/* Polished Export View */
+/* ── EXPORT VIEW ─────────────────────────────────────────────────────────────*/
 .is-exporting .react-flow__handle,
 .is-exporting .react-flow__node-resizer,
 .is-exporting .react-flow__nodesselection-rect,

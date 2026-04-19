@@ -249,7 +249,7 @@ export const useStore = create<AppState>((set, get) => ({
       id: groupId,
       type: 'group',
       position: { x: minX - padding, y: minY - padding },
-      style: { width: (maxX - minX) + padding * 2, height: (maxY - minY) + padding * 2 },
+      style: { width: (maxX - minX) + padding * 2, height: (maxY - minY) + padding * 2, pointerEvents: 'none' as unknown as undefined },
       data: { label: 'New Group', type: 'group', volume: 0, ctr: 0, cpc: 0 }
     };
 
