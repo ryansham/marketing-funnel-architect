@@ -117,9 +117,9 @@ function useHighlight(id: string) {
 // ─── Shared Handle set ─────────────────────────────────────────────────────────
 
 function NodeHandles({ visible, color = '#38bdf8' }: { visible: boolean; color?: string }) {
-  if (!visible) return null;
-  const cls = `!w-2.5 !h-2.5 !border-2 !border-white/80 transition-transform hover:scale-125`;
-  const style = { backgroundColor: color };
+  // Always render handles but hide them via CSS opacity unless visible
+  const cls = `!w-3 !h-3 !border-2 !border-white/80 transition-all duration-150`;
+  const style = { backgroundColor: color, opacity: visible ? 1 : 0, transition: 'opacity 0.15s' };
   return (
     <>
       <Handle id="left"   type="target" position={Position.Left}   className={cn(cls, '!-left-1.5')}   style={style} />

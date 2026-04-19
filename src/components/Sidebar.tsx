@@ -81,88 +81,50 @@ export default function Sidebar() {
   };
 
   const GlobalActions = () => (
-    <div className={cn("p-4 border-b space-y-4", theme === 'dark' ? "border-border" : "border-slate-200")}>
+    <div className={cn("p-4 border-b space-y-3", theme === 'dark' ? "border-border" : "border-slate-200")}>
+      {/* Undo / Redo */}
       <div className="flex items-center justify-between">
-         <span className="text-[10px] uppercase tracking-widest text-text-dim font-black">History</span>
-         <div className="flex items-center gap-1">
-            <button 
-              onClick={undo}
-              disabled={historyIndex <= 0}
-              className={cn("p-1.5 border rounded hover:bg-black/5 disabled:opacity-20 transition-all", theme === 'dark' ? "border-border text-white" : "border-slate-200 text-slate-700")}
-              title="Undo (Ctrl+Z)"
-            ><LucideIcons.Undo2 size={12} /></button>
-            <button 
-              onClick={redo}
-              disabled={historyIndex >= history.length - 1}
-              className={cn("p-1.5 border rounded hover:bg-black/5 disabled:opacity-20 transition-all", theme === 'dark' ? "border-border text-white" : "border-slate-200 text-slate-700")}
-              title="Redo (Ctrl+Shift+Z)"
-            ><LucideIcons.Redo2 size={12} /></button>
-         </div>
-      </div>
-      
-      <div className="flex items-center gap-2">
-         <button 
-            onClick={() => {
-              const selectedIds = nodes.filter(n => n.selected).map(n => n.id);
-              if (selectedIds.length > 1) createGroup(selectedIds);
-            }}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-              theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 shadow-sm hover:border-slate-300"
-            )}
-         >
-            <LucideIcons.Layers size={12} /> Group
-         </button>
-         <button 
-            onClick={() => {
-              if (selectedNode?.type === 'group') ungroup(selectedNode.id);
-            }}
-            disabled={selectedNode?.type !== 'group'}
-            className={cn(
-              "flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-[10px] font-black uppercase tracking-widest transition-all opacity-100 disabled:opacity-20",
-              theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 shadow-sm hover:border-slate-300"
-            )}
-         >
-            <LucideIcons.Unlink size={12} /> Ungroup
-         </button>
+        <span className="text-[10px] uppercase tracking-widest text-text-dim font-black opacity-60">History</span>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={undo}
+            disabled={historyIndex <= 0}
+            className={cn("p-1.5 border rounded hover:bg-black/5 disabled:opacity-20 transition-all", theme === 'dark' ? "border-border text-white" : "border-slate-200 text-slate-700")}
+            title="Undo (Ctrl+Z)"
+          ><LucideIcons.Undo2 size={12} /></button>
+          <button
+            onClick={redo}
+            disabled={historyIndex >= history.length - 1}
+            className={cn("p-1.5 border rounded hover:bg-black/5 disabled:opacity-20 transition-all", theme === 'dark' ? "border-border text-white" : "border-slate-200 text-slate-700")}
+            title="Redo (Ctrl+Y)"
+          ><LucideIcons.Redo2 size={12} /></button>
+        </div>
       </div>
 
-      <div className="pt-2 flex flex-col gap-2">
-         <div className="flex items-center justify-between">
-            <span className="text-[10px] uppercase tracking-widest text-text-dim font-black">Export & Sync</span>
-         </div>
-         <div className="grid grid-cols-2 gap-2">
-            <label className={cn(
-               "cursor-pointer flex items-center justify-center gap-2 py-2 border rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
-               theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 shadow-sm hover:border-slate-300"
-            )}>
-               <LucideIcons.Upload size={12} /> Import JSON
-               <input type="file" className="hidden" accept=".json" onChange={handleImportJSON} />
-            </label>
-            <button 
-               onClick={handleExportJSON}
-               className={cn(
-                  "flex items-center justify-center gap-2 py-2 border rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
-                  theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 shadow-sm hover:border-slate-300"
-               )}
-            >
-               <LucideIcons.Download size={12} /> Export JSON
-            </button>
-         </div>
-         <div className="grid grid-cols-3 gap-1 pt-1">
-            {['png', 'jpg', 'pdf'].map(fmt => (
-               <button 
-                  key={fmt}
-                  onClick={() => handleDownloadImage(fmt as any)}
-                  className={cn(
-                     "flex items-center justify-center gap-1.5 py-1.5 border rounded-md text-[8px] font-black uppercase tracking-widest transition-all",
-                     theme === 'dark' ? "bg-black/20 border-border text-white/60 hover:text-white" : "bg-slate-50 border-slate-100 text-slate-400 hover:text-slate-900"
-                  )}
-               >
-                  {fmt}
-               </button>
-            ))}
-         </div>
+      {/* Group / Ungroup */}
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => {
+            const selectedIds = nodes.filter(n => n.selected).map(n => n.id);
+            if (selectedIds.length > 1) createGroup(selectedIds);
+          }}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
+            theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 shadow-sm hover:border-slate-300"
+          )}
+        >
+          <LucideIcons.Layers size={12} /> Group
+        </button>
+        <button
+          onClick={() => { if (selectedNode?.type === 'group') ungroup(selectedNode.id); }}
+          disabled={selectedNode?.type !== 'group'}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-20",
+            theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 shadow-sm hover:border-slate-300"
+          )}
+        >
+          <LucideIcons.Unlink size={12} /> Ungroup
+        </button>
       </div>
     </div>
   );

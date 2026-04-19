@@ -118,30 +118,32 @@ export default function App() {
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [menu, setMenu] = useState<{ id?: string, type?: string, top?: number, left?: number, right?: number, bottom?: number } | null>(null);
 
-  // Auto-save to LocalStorage
-  useEffect(() => {
-    const timer = setInterval(() => {
-      if (nodes.length > 0) {
-        const data = { nodes, edges };
-        localStorage.setItem('funnel_architect_autosave', JSON.stringify(data));
-      }
-    }, 15000); // 15 seconds
-    return () => clearInterval(timer);
-  }, [nodes, edges]);
-
-  // Load auto-save on mount
-  useEffect(() => {
+  // Initialize: load autosave if exists, otherwise create default sequence
+  React.useEffect(() => {
     const saved = localStorage.getItem('funnel_architect_autosave');
     if (saved) {
       try {
         const { nodes: savedNodes, edges: savedEdges } = JSON.parse(saved);
         if (savedNodes && savedNodes.length > 0) {
           importCampaign({ nodes: savedNodes, edges: savedEdges });
+          return; // don't create default if we have a save
         }
       } catch (err) {
         console.error('Failed to load auto-save', err);
       }
     }
+    createDefaultSequence();
+  }, []);
+
+  // Auto-save to LocalStorage every 15 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const { nodes: n, edges: e } = useStore.getState();
+      if (n.length > 0) {
+        localStorage.setItem('funnel_architect_autosave', JSON.stringify({ nodes: n, edges: e }));
+      }
+    }, 15000);
+    return () => clearInterval(timer);
   }, []);
 
   // Keyboard Shortcuts
@@ -248,11 +250,6 @@ export default function App() {
   // Area Selection Helper
   const selectedNodes = nodes.filter(n => n.selected);
   const showGroupPanel = selectedNodes.length > 1;
-
-  // Initialize store with starting values
-  React.useEffect(() => {
-    createDefaultSequence();
-  }, []);
 
   const handleExportSelection = async (mode: 'download' | 'clipboard') => {
     const selectedNodes = nodes.filter(n => n.selected);
