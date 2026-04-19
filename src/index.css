@@ -1,0 +1,128 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&family=Montserrat:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&family=Dancing+Script&family=Caveat&family=Sacramento&family=Pacifico&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Roboto", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Montserrat", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-accent: #38bdf8;
+  --color-discovery: #3b82f6;
+  --color-direct: #22c55e;
+  --color-owned: #a855f7;
+  --color-physical: #f97316;
+}
+
+:root {
+  --bg: #f8fafc;
+  --sidebar: #ffffff;
+  --accent: #38bdf8;
+  --discovery: #3b82f6;
+  --direct: #22c55e;
+  --owned: #a855f7;
+  --physical: #f97316;
+  --text-main: #0f172a;
+  --text-dim: #64748b;
+  --border: #e2e8f0;
+}
+
+.dark {
+  --bg: #020617;
+  --sidebar: #0f172a;
+  --text-main: #f8fafc;
+  --text-dim: #94a3b8;
+  --border: #1e293b;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text-main);
+  @apply antialiased font-sans transition-colors duration-500;
+  margin: 0;
+  overflow: hidden;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--border);
+  @apply rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-slate-400;
+}
+
+/* React Flow custom styles */
+.react-flow__handle {
+  width: 8px !important;
+  height: 8px !important;
+  @apply border-2 border-white bg-accent;
+}
+
+.react-flow__edge-path {
+  @apply stroke-[2px];
+}
+
+.react-flow__controls-button {
+  background-color: var(--sidebar);
+  border-color: var(--border);
+  @apply border-t-0 first:border-t transition-colors;
+}
+
+.react-flow__attribution {
+  display: none !important;
+}
+
+/* React Quill Overrides for Sticky Note */
+.ql-container.ql-snow {
+  border: none !important;
+  font-family: inherit !important;
+  background: transparent !important;
+}
+
+.ql-editor {
+  padding: 8px !important;
+  color: inherit !important;
+  font-size: 13px !important;
+  line-height: 1.5 !important;
+}
+
+.ql-editor.ql-blank::before {
+  color: var(--text-dim) !important;
+  opacity: 0.5 !important;
+  font-style: italic !important;
+}
+
+.light .rich-editor-canvas .ql-editor.ql-blank::before {
+  color: #000000 !important;
+  opacity: 1 !important;
+  font-style: normal !important;
+}
+
+.rich-editor-canvas .ql-editor {
+  height: 100% !important;
+}
+
+.react-flow__nodeselection-rect, .react-flow__selection {
+  @apply bg-accent/20 border-accent rounded-xl pointer-events-none;
+}
+
+/* Polished Export View */
+.is-exporting .react-flow__handle,
+.is-exporting .react-flow__node-resizer,
+.is-exporting .react-flow__nodesselection-rect,
+.is-exporting .react-flow__panel {
+  display: none !important;
+}
+
+.is-exporting .react-flow__node {
+  box-shadow: none !important;
+}
