@@ -2,37 +2,155 @@
 // ─── i18n ─────────────────────────────────────────────────────────────────────
 const langDict = {
   en: {
+    // App
     appName: 'Marketing Funnel Architect',
-    discoveryChannels: 'Discovery Channels', landingPage: 'Landing Page',
-    toolsVisuals: 'Tools & Visuals', marketingPresets: 'Marketing Presets',
-    history: 'History', savePreset: '+ Save current as preset',
-    socialFlow: 'Social Flow', autoArrange: 'Auto Arrange',
-    fitView: 'Fit View', importJSON: 'Import JSON', exportLabel: 'Export',
-    confirmReplace: 'This will replace your current canvas. Continue?',
+    // Left sidebar sections
+    discoveryChannels: 'Discovery Channels',
+    landingPage: 'Landing Page',
+    toolsVisuals: 'Tools & Visuals',
+    marketingPresets: 'Marketing Presets',
+    // Left sidebar items
+    ads: 'Ads', googleAds: 'Google Ads', metaAds: 'Meta Ads', others: 'Others',
+    email: 'Email', forms: 'Forms', social: 'Social', outdoorMedia: 'Outdoor Media',
+    largeTitle: 'Large Title', marketingNotes: 'Marketing Notes', imageLogo: 'Image/Logo',
+    square: 'Square', circle: 'Circle', line: 'Line', dotted: 'Dotted',
+    browseTemplates: 'Browse Templates', saveAsPreset: '{t.saveAsPreset}',
+    // Header
+    importJSON: 'Import JSON', exportLabel: 'Export',
+    // Toolbar tooltips
+    selectionTool: 'Selection Tool', handTool: 'Hand Tool',
+    autoArrange: 'Auto Arrange', toggleMiniMap: 'Toggle MiniMap',
+    searchNodes: 'Search nodes',
+    // Right sidebar
+    history: 'History', group: 'Group', ungroup: 'Ungroup',
+    architectMode: 'Architect Mode', architectModeDesc: 'Select any component on the canvas to configure its O2O properties.',
+    channelSelection: 'Channel Selection', nodeNameTitle: 'Node Name / Title',
+    styleConfig: 'Style Configuration', visualAppearance: 'Visual Appearance',
+    fillColor: 'Fill Color', borderColor: 'Border Color', borderThickness: 'Border Thickness',
+    pageConfig: 'Page Configuration', pageTemplate: 'Page Template',
+    mediaToolkit: 'Media Toolkit', addModule: 'Add Module',
+    typographyLayout: 'Typography & Layout', alignment: 'Alignment',
+    titleSize: 'Title Size', fontFamily: 'Font Family',
+    spacingControls: 'Spacing Controls', letterSpacing: 'Letter Spacing', lineHeight: 'Line Height',
+    livePreview: 'Live Preview',
+    // Search
     searchPlaceholder: 'Search nodes... (Esc to close)',
-    benchmarkLabel: 'Industry Benchmark',
+    searchStart: 'Start typing to find a node on the canvas',
+    searchNone: 'No nodes found',
+    // Tour
+    tourSkip: 'Skip tour', tourNext: 'Next', tourDone: 'Done!',
+    tourStep1Title: 'Drag cards onto the canvas', tourStep1Body: 'Pick any channel from the left panel (Ads, Email, Social…) and drag it onto the canvas.',
+    tourStep2Title: 'Connect cards', tourStep2Body: 'Hover a card to reveal its blue handles, then drag from a handle to another card to create a connection.',
+    tourStep3Title: 'Configure each step', tourStep3Body: 'Click any card to open its settings on the right — add notes, change channel, and style your funnel.',
+    tourStep4Title: 'Export your funnel', tourStep4Body: 'Use the Export button (top-right) to download as PNG, PDF or share as JSON.',
+    // Templates modal
+    chooseTemplate: 'Choose a Campaign Template',
+    chooseTemplateDesc: 'Each template comes with a full funnel flow, descriptions and strategic notes on every card',
+    viewTemplate: 'View template →', startBlank: '→ Start with blank canvas', cancel: 'Cancel',
+    // Confirm
+    confirmReplace: 'This will replace your current canvas. Continue?',
+    // Footer
+    footerCopyright: '©ryansham.martechtalks',
+    // Context menu
+    canvasActions: 'Canvas Actions', paste: 'Paste', fitView: 'Fit View',
+    edgeActions: 'Edge Actions', removeConnection: 'Remove Connection',
+    configureChannel: 'Configure Channel', resetContentStack: 'Reset Content Stack',
+    selectionExport: 'Selection Export', downloadPNG: 'Download Selection as PNG',
+    copyPNG: 'Copy Selection as PNG', copySelection: 'Copy Selection',
+    duplicate: 'Duplicate', deleteSelection: 'Delete Selection',
+    bringToTop: 'Bring to Top', sendToBack: 'Send to Back',
+    // Note placeholder
+    addNote: 'Add a note...',
   },
   'zh-hk': {
     appName: 'Marketing Funnel Architect',
     discoveryChannels: '探索頻道', landingPage: '著陸頁',
     toolsVisuals: '工具與視覺', marketingPresets: '行銷模板',
-    history: '歷史記錄', savePreset: '+ 儲存為模板',
-    socialFlow: '社交流程', autoArrange: '自動排列',
-    fitView: '全圖顯示', importJSON: '匯入 JSON', exportLabel: '匯出',
-    confirmReplace: '此操作將取代目前畫布，確定繼續？',
+    ads: '廣告', googleAds: 'Google 廣告', metaAds: 'Meta 廣告', others: '其他',
+    email: '電郵', forms: '表單', social: '社交媒體', outdoorMedia: '戶外媒體',
+    largeTitle: '大標題', marketingNotes: '行銷備注', imageLogo: '圖片/標誌',
+    square: '方形', circle: '圓形', line: '直線', dotted: '虛線',
+    browseTemplates: '瀏覽模板', saveAsPreset: '+ 儲存為自訂模板',
+    importJSON: '匯入 JSON', exportLabel: '匯出',
+    selectionTool: '選擇工具', handTool: '手形工具',
+    autoArrange: '自動排列', toggleMiniMap: '切換小地圖', searchNodes: '搜尋節點',
+    history: '歷史記錄', group: '組合', ungroup: '取消組合',
+    architectMode: '設計師模式', architectModeDesc: '選取畫布上的任何元素以設定其屬性。',
+    channelSelection: '頻道選擇', nodeNameTitle: '節點名稱／標題',
+    styleConfig: '樣式設定', visualAppearance: '視覺外觀',
+    fillColor: '填充顏色', borderColor: '邊框顏色', borderThickness: '邊框粗細',
+    pageConfig: '頁面設定', pageTemplate: '頁面模板',
+    mediaToolkit: '媒體工具包', addModule: '新增模組',
+    typographyLayout: '字型與排版', alignment: '對齊方式',
+    titleSize: '標題大小', fontFamily: '字型',
+    spacingControls: '間距控制', letterSpacing: '字距', lineHeight: '行距',
+    livePreview: '即時預覽',
     searchPlaceholder: '搜尋節點… (Esc 關閉)',
-    benchmarkLabel: '業界基準',
+    searchStart: '輸入以尋找畫布上的節點',
+    searchNone: '找不到節點',
+    tourSkip: '略過導覽', tourNext: '下一步', tourDone: '完成！',
+    tourStep1Title: '拖曳卡片到畫布', tourStep1Body: '從左側面板選擇頻道（廣告、電郵、社交媒體等），拖曳到畫布上。',
+    tourStep2Title: '連結卡片', tourStep2Body: '將滑鼠移到卡片上以顯示藍色連接點，從連接點拖曳到另一張卡片以建立連結。',
+    tourStep3Title: '設定每個步驟', tourStep3Body: '點擊任何卡片以在右側開啟其設定 — 新增備注、更換頻道並設計漏斗。',
+    tourStep4Title: '匯出你的漏斗', tourStep4Body: '使用右上角的「匯出」按鈕以 PNG、PDF 下載或以 JSON 分享。',
+    chooseTemplate: '選擇活動模板',
+    chooseTemplateDesc: '每個模板均附有完整漏斗流程、說明及每張卡片的策略備注',
+    viewTemplate: '查看模板 →', startBlank: '→ 從空白畫布開始', cancel: '取消',
+    confirmReplace: '此操作將取代目前畫布，確定繼續？',
+    footerCopyright: '©ryansham.martechtalks',
+    canvasActions: '畫布操作', paste: '貼上', fitView: '全圖顯示',
+    edgeActions: '連線操作', removeConnection: '移除連線',
+    configureChannel: '設定頻道', resetContentStack: '重設內容堆疊',
+    selectionExport: '選取範圍匯出', downloadPNG: '以 PNG 下載選取範圍',
+    copyPNG: '複製選取範圍為 PNG', copySelection: '複製選取',
+    duplicate: '複製', deleteSelection: '刪除選取',
+    bringToTop: '移至最前', sendToBack: '移至最後',
+    addNote: '新增備注…',
   },
   'zh-cn': {
     appName: 'Marketing Funnel Architect',
     discoveryChannels: '探索渠道', landingPage: '落地页',
     toolsVisuals: '工具与视觉', marketingPresets: '营销模板',
-    history: '历史记录', savePreset: '+ 保存为模板',
-    socialFlow: '社交流程', autoArrange: '自动排列',
-    fitView: '全图显示', importJSON: '导入 JSON', exportLabel: '导出',
-    confirmReplace: '此操作将替换当前画布，确定继续？',
+    ads: '广告', googleAds: 'Google 广告', metaAds: 'Meta 广告', others: '其他',
+    email: '邮件', forms: '表单', social: '社交媒体', outdoorMedia: '户外媒体',
+    largeTitle: '大标题', marketingNotes: '营销备注', imageLogo: '图片/标志',
+    square: '方形', circle: '圆形', line: '直线', dotted: '虚线',
+    browseTemplates: '浏览模板', saveAsPreset: '+ 保存为自定义模板',
+    importJSON: '导入 JSON', exportLabel: '导出',
+    selectionTool: '选择工具', handTool: '手形工具',
+    autoArrange: '自动排列', toggleMiniMap: '切换小地图', searchNodes: '搜索节点',
+    history: '历史记录', group: '组合', ungroup: '取消组合',
+    architectMode: '设计师模式', architectModeDesc: '选择画布上的任何元素以配置其属性。',
+    channelSelection: '渠道选择', nodeNameTitle: '节点名称／标题',
+    styleConfig: '样式配置', visualAppearance: '视觉外观',
+    fillColor: '填充颜色', borderColor: '边框颜色', borderThickness: '边框粗细',
+    pageConfig: '页面配置', pageTemplate: '页面模板',
+    mediaToolkit: '媒体工具包', addModule: '添加模块',
+    typographyLayout: '字体与排版', alignment: '对齐方式',
+    titleSize: '标题大小', fontFamily: '字体',
+    spacingControls: '间距控制', letterSpacing: '字距', lineHeight: '行距',
+    livePreview: '实时预览',
     searchPlaceholder: '搜索节点… (Esc 关闭)',
-    benchmarkLabel: '行业基准',
+    searchStart: '输入以查找画布上的节点',
+    searchNone: '未找到节点',
+    tourSkip: '跳过导览', tourNext: '下一步', tourDone: '完成！',
+    tourStep1Title: '拖拽卡片到画布', tourStep1Body: '从左侧面板选择渠道（广告、邮件、社交媒体等），拖拽到画布上。',
+    tourStep2Title: '连接卡片', tourStep2Body: '将鼠标移到卡片上显示蓝色连接点，从连接点拖拽到另一张卡片建立连接。',
+    tourStep3Title: '配置每个步骤', tourStep3Body: '点击任意卡片在右侧打开设置 — 添加备注、更换渠道并设计漏斗。',
+    tourStep4Title: '导出你的漏斗', tourStep4Body: '使用右上角的"导出"按钮以 PNG、PDF 下载或以 JSON 分享。',
+    chooseTemplate: '选择活动模板',
+    chooseTemplateDesc: '每个模板均附有完整漏斗流程、说明及每张卡片的策略备注',
+    viewTemplate: '查看模板 →', startBlank: '→ 从空白画布开始', cancel: '取消',
+    confirmReplace: '此操作将替换当前画布，确定继续？',
+    footerCopyright: '©ryansham.martechtalks',
+    canvasActions: '画布操作', paste: '粘贴', fitView: '全图显示',
+    edgeActions: '连线操作', removeConnection: '移除连线',
+    configureChannel: '配置渠道', resetContentStack: '重置内容堆叠',
+    selectionExport: '选区导出', downloadPNG: '以 PNG 下载选区',
+    copyPNG: '复制选区为 PNG', copySelection: '复制选区',
+    duplicate: '复制', deleteSelection: '删除选区',
+    bringToTop: '移至最前', sendToBack: '移至最后',
+    addNote: '添加备注…',
   },
 } as const;
 
@@ -153,7 +271,7 @@ export default function App() {
   const [showMiniMap, setShowMiniMap] = React.useState(false);
   const [lang, setLang] = React.useState<'en'|'zh-hk'|'zh-cn'>(() => (localStorage.getItem('fa_lang') as any) || 'en');
   const t = React.useMemo(() => langDict[lang], [lang]);
-  const setLanguage = (l: 'en'|'zh-hk'|'zh-cn') => { setLang(l); localStorage.setItem('fa_lang', l); };
+  const setLanguage = (l: 'en'|'zh-hk'|'zh-cn') => { setLang(l); useStore.getState().setLang(l); };
   const [leftCollapsed, setLeftCollapsed] = React.useState<Record<string,boolean>>({});
   const [showSearch, setShowSearch] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -708,7 +826,7 @@ export default function App() {
           <div className="space-y-2">
             <ToolkitItem 
               icon={Search} 
-              label="Ads" 
+              label={t.ads} 
               color="bg-discovery" 
               active={activeMenu === 'ads'}
               hasSubmenu
@@ -717,28 +835,28 @@ export default function App() {
             />
             {activeMenu === 'ads' && (
               <div className="ml-4 space-y-1 animate-in slide-in-from-top-2 duration-200">
-                 <SubToolkitItem label="Google Ads" onClick={() => addNode('discovery', 'Google Ads', 'marketing', { primaryChannel: 'google-ads' })} theme={theme} />
-                 <SubToolkitItem label="Meta Ads" onClick={() => addNode('discovery', 'Meta Ads', 'marketing', { primaryChannel: 'facebook' })} theme={theme} />
-                 <SubToolkitItem label="Others" onClick={() => addNode('discovery', 'Other Ads', 'marketing', { primaryChannel: 'others' })} theme={theme} />
+                 <SubToolkitItem label={t.googleAds} onClick={() => addNode('discovery', 'Google Ads', 'marketing', { primaryChannel: 'google-ads' })} theme={theme} />
+                 <SubToolkitItem label={t.metaAds} onClick={() => addNode('discovery', 'Meta Ads', 'marketing', { primaryChannel: 'facebook' })} theme={theme} />
+                 <SubToolkitItem label={t.others} onClick={() => addNode('discovery', 'Other Ads', 'marketing', { primaryChannel: 'others' })} theme={theme} />
               </div>
             )}
             <ToolkitItem 
               icon={Mail} 
-              label="Email" 
+              label={t.email} 
               color="bg-discovery" 
               onClick={() => addNode('discovery', 'Email', 'marketing', { primaryChannel: 'email' })} 
               theme={theme}
             />
             <ToolkitItem 
               icon={ClipboardList} 
-              label="Forms" 
+              label={t.forms} 
               color="bg-discovery" 
               onClick={() => addNode('discovery', 'Form', 'marketing', { primaryChannel: 'form' })} 
               theme={theme}
             />
             <ToolkitItem 
               icon={Share2} 
-              label="Social" 
+              label={t.social} 
               color="bg-discovery" 
               hasSubmenu 
               active={activeMenu === 'social'}
@@ -760,7 +878,7 @@ export default function App() {
 
             <ToolkitItem 
               icon={Store} 
-              label="Outdoor Media" 
+              label={t.outdoorMedia} 
               color="bg-physical" 
               hasSubmenu
               active={activeMenu === 'outdoor'}
@@ -774,7 +892,7 @@ export default function App() {
             )}
              <ToolkitItem 
               icon={Plus} 
-              label="Others" 
+              label={t.others} 
               color="bg-slate-400" 
               onClick={() => addNode('discovery', 'Other Source', 'marketing', { primaryChannel: 'others' })} 
               theme={theme}
@@ -785,7 +903,7 @@ export default function App() {
 
         <section>
           <button onClick={() => toggleSection('left','landing')} className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 opacity-50 hover:opacity-100 transition-opacity">
-            <span>Landing Page</span>
+            <span>{t.landingPage}</span>
             <LucideIcons.ChevronDown size={12} className={cn("transition-transform", leftCollapsed['landing'] && "rotate-180")} />
           </button>
           {!leftCollapsed['landing'] && <>
@@ -797,14 +915,14 @@ export default function App() {
 
         <section>
           <button onClick={() => toggleSection('left','tools')} className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 opacity-50 hover:opacity-100 transition-opacity">
-            <span>Tools &amp; Visuals</span>
+            <span>{t.toolsVisuals}</span>
             <LucideIcons.ChevronDown size={12} className={cn("transition-transform", leftCollapsed['tools'] && "rotate-180")} />
           </button>
           {!leftCollapsed['tools'] && <>
           <div className="space-y-2">
-            <ToolkitItem icon={Heading1} label="Large Title" color="bg-accent" onClick={() => addNode('title', 'Headline', 'title', { titleType: 'h1', textAlign: 'center', label2: 'Objective: ' })} theme={theme} />
-            <ToolkitItem icon={Type} label="Marketing Notes" color="bg-slate-400" onClick={() => addNode('text', 'Marketing notes...', 'text', { fontFamily: 'Roboto', fontSize: 18 })} theme={theme} />
-            <ToolkitItem icon={Image} label="Image/logo" color="bg-white" onClick={() => addNode('image', '', 'image')} theme={theme} />
+            <ToolkitItem icon={Heading1} label={t.largeTitle} color="bg-accent" onClick={() => addNode('title', 'Headline', 'title', { titleType: 'h1', textAlign: 'center', label2: 'Objective: ' })} theme={theme} />
+            <ToolkitItem icon={Type} label={t.marketingNotes} color="bg-slate-400" onClick={() => addNode('text', 'Marketing notes...', 'text', { fontFamily: 'Roboto', fontSize: 18 })} theme={theme} />
+            <ToolkitItem icon={Image} label={t.imageLogo} color="bg-white" onClick={() => addNode('image', '', 'image')} theme={theme} />
           </div>
           
           <div className="grid grid-cols-2 gap-2 mt-4">
@@ -812,25 +930,25 @@ export default function App() {
                 onClick={() => addNode('shape', 'Square', 'shape', { shapeType: 'square' as ShapeType, strokeWidth: 2, strokeColor: '#38bdf8', fillColor: '#38bdf8' })}
                 className={cn("flex items-center gap-2 p-2 border rounded-lg text-[9px] font-bold transition-all", theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50")}
              >
-                <LucideIcons.Square size={12} /> Square
+                <LucideIcons.Square size={12} /> {t.square}
              </button>
              <button 
                 onClick={() => addNode('shape', 'Circle', 'shape', { shapeType: 'circle' as ShapeType, strokeWidth: 2, strokeColor: '#38bdf8', fillColor: '#38bdf8' })}
                 className={cn("flex items-center gap-2 p-2 border rounded-lg text-[9px] font-bold transition-all", theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50")}
              >
-                <LucideIcons.Circle size={12} /> Circle
+                <LucideIcons.Circle size={12} /> {t.circle}
              </button>
              <button 
                 onClick={() => addNode('shape', 'Line', 'shape', { shapeType: 'line' as ShapeType, strokeWidth: 2, strokeColor: '#38bdf8' })}
                 className={cn("flex items-center gap-2 p-2 border rounded-lg text-[9px] font-bold transition-all", theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50")}
              >
-                <LucideIcons.Minus size={12} /> Line
+                <LucideIcons.Minus size={12} /> {t.line}
              </button>
              <button 
                 onClick={() => addNode('shape', 'Dotted', 'shape', { shapeType: 'dotted-line' as ShapeType, strokeWidth: 2, strokeColor: '#38bdf8' })}
                 className={cn("flex items-center gap-2 p-2 border rounded-lg text-[9px] font-bold transition-all", theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 hover:bg-slate-50")}
              >
-                <LucideIcons.MoreHorizontal size={12} /> Dotted
+                <LucideIcons.MoreHorizontal size={12} /> {t.dotted}
              </button>
           </div>
           </>}
@@ -838,7 +956,7 @@ export default function App() {
 
         <section className="mt-auto pt-6 border-t border-border/10">
           <button onClick={() => toggleSection('left','presets')} className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 opacity-50 hover:opacity-100 transition-opacity">
-            <span>Marketing Presets</span>
+            <span>{t.marketingPresets}</span>
             <LucideIcons.ChevronDown size={12} className={cn("transition-transform", leftCollapsed['presets'] && "rotate-180")} />
           </button>
           {!leftCollapsed['presets'] && <>
@@ -867,7 +985,7 @@ export default function App() {
               }}
               className="w-full py-2 border border-dashed border-border rounded-lg text-[10px] font-black uppercase opacity-50 hover:opacity-100 transition-opacity"
             >
-              + Save current as preset
+              {t.saveAsPreset}
             </button>
           </div>
           </>}
@@ -948,18 +1066,18 @@ export default function App() {
                theme === 'dark' ? "bg-slate-900" : "bg-white"
              )}>
                 {/* Tool mode */}
-                <button onClick={() => setInteractionMode('select')} className={cn("p-2 rounded-lg transition-all", interactionMode === 'select' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Selection Tool (V)"><LucideIcons.MousePointer2 size={16} /></button>
-                <button onClick={() => setInteractionMode('pan')} className={cn("p-2 rounded-lg transition-all", interactionMode === 'pan' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Hand Tool (H / Space)"><LucideIcons.Hand size={16} /></button>
+                <button onClick={() => setInteractionMode('select')} className={cn("p-2 rounded-lg transition-all", interactionMode === 'select' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title={t.selectionTool}><LucideIcons.MousePointer2 size={16} /></button>
+                <button onClick={() => setInteractionMode('pan')} className={cn("p-2 rounded-lg transition-all", interactionMode === 'pan' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title={t.handTool}><LucideIcons.Hand size={16} /></button>
                 <div className="w-[1px] h-5 bg-border mx-1 opacity-30" />
                 {/* Zoom controls */}
                 <Controls className={cn("!static !m-0 !border-none !shadow-none !bg-transparent !overflow-visible !flex !flex-row !gap-0.5", theme === 'dark' ? "!fill-white" : "!fill-slate-600")} showInteractive={false} />
                 <div className="w-[1px] h-5 bg-border mx-1 opacity-30" />
                 {/* Auto Arrange */}
-                <button onClick={() => arrangeGrid('grid')} className="p-2 rounded-lg transition-all text-text-dim hover:bg-black/5" title="Auto Arrange"><LucideIcons.LayoutGrid size={16} /></button>
+                <button onClick={() => arrangeGrid('grid')} className="p-2 rounded-lg transition-all text-text-dim hover:bg-black/5" title={t.autoArrange}><LucideIcons.LayoutGrid size={16} /></button>
                 {/* Cmd+K Search */}
-                <button onClick={() => setShowSearch(v => !v)} className={cn("p-2 rounded-lg transition-all", showSearch ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Search nodes (⌘K)"><LucideIcons.Search size={16} /></button>
+                <button onClick={() => setShowSearch(v => !v)} className={cn("p-2 rounded-lg transition-all", showSearch ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title={`${t.searchNodes} (⌘K)`}><LucideIcons.Search size={16} /></button>
                 {/* MiniMap toggle */}
-                <button onClick={() => setShowMiniMap(v => !v)} className={cn("p-2 rounded-lg transition-all", showMiniMap ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Toggle MiniMap"><LucideIcons.Map size={16} /></button>
+                <button onClick={() => setShowMiniMap(v => !v)} className={cn("p-2 rounded-lg transition-all", showMiniMap ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title={t.toggleMiniMap}><LucideIcons.Map size={16} /></button>
              </div>
           </Panel>
 
@@ -1020,10 +1138,10 @@ export default function App() {
           {/* ── Guided Tour ─────────────────────────────────────────────── */}
           {showTour && (() => {
             const STEPS = [
-              { icon: '🃏', title: 'Drag cards onto the canvas', body: 'Pick any channel from the left panel (Ads, Email, Social…) and drag it onto the canvas.' },
-              { icon: '🔗', title: 'Connect cards', body: 'Hover a card to reveal its blue handles, then drag from a handle to another card to create a connection.' },
-              { icon: '⚙️', title: 'Configure each step', body: 'Click any card to open its settings on the right — add notes, change channel, and style your funnel.' },
-              { icon: '📤', title: 'Export your funnel', body: 'Use the Export button (top-right) to download as PNG, PDF or share as JSON.' },
+              { icon: '🃏', title: t.tourStep1Title, body: t.tourStep1Body },
+              { icon: '🔗', title: t.tourStep2Title, body: t.tourStep2Body },
+              { icon: '⚙️', title: t.tourStep3Title, body: t.tourStep3Body },
+              { icon: '📤', title: t.tourStep4Title, body: t.tourStep4Body },
             ];
             const step = STEPS[tourStep];
             return (
@@ -1468,7 +1586,7 @@ function ContextMenu({
             {!isMultiSelect && isLanding && (
               <ContextMenuItem 
                 icon={LucideIcons.RefreshCcw} 
-                label="Reset Content Stack" 
+                label={t.resetContentStack} 
                 onClick={() => handleAction(() => {
                   useStore.getState().updateNodeData(id, { mockupModules: [{ id: 'm1', type: 'Hero', content: {} }, { id: 'm2', type: 'CTA', content: {} }] });
                 })} 
@@ -1479,7 +1597,7 @@ function ContextMenu({
             {!isMultiSelect && isMarketing && (
               <ContextMenuItem 
                 icon={LucideIcons.Settings2} 
-                label="Configure Channel" 
+                label={t.configureChannel} 
                 onClick={() => handleAction(() => useStore.getState().setSelectedNode(id))} 
                 theme={theme} 
               />
@@ -1488,22 +1606,22 @@ function ContextMenu({
             <div className="h-[1px] bg-border my-1 mx-1 opacity-20" />
 
             <div className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest text-text-dim opacity-50">Selection Export</div>
-            <ContextMenuItem icon={LucideIcons.ImageDown} label="Download Selection as PNG" onClick={() => handleAction(() => handleExportSelection('download'))} theme={theme} />
-            <ContextMenuItem icon={LucideIcons.ClipboardCopy} label="Copy Selection as PNG" onClick={() => handleAction(() => handleExportSelection('clipboard'))} theme={theme} />
+            <ContextMenuItem icon={LucideIcons.ImageDown} label={t.downloadPNG} onClick={() => handleAction(() => handleExportSelection('download'))} theme={theme} />
+            <ContextMenuItem icon={LucideIcons.ClipboardCopy} label={t.copyPNG} onClick={() => handleAction(() => handleExportSelection('clipboard'))} theme={theme} />
             
             <div className="h-[1px] bg-border my-1 mx-1 opacity-20" />
             
-            <ContextMenuItem icon={LucideIcons.Copy} label="Copy Selection" onClick={() => handleAction(copySelection)} theme={theme} />
-            <ContextMenuItem icon={LucideIcons.Files} label="Duplicate" onClick={() => handleAction(duplicateSelection)} theme={theme} />
-            <ContextMenuItem icon={LucideIcons.Trash2} label="Delete Selection" onClick={() => handleAction(deleteSelection)} theme={theme} danger />
+            <ContextMenuItem icon={LucideIcons.Copy} label={t.copySelection} onClick={() => handleAction(copySelection)} theme={theme} />
+            <ContextMenuItem icon={LucideIcons.Files} label={t.duplicate} onClick={() => handleAction(duplicateSelection)} theme={theme} />
+            <ContextMenuItem icon={LucideIcons.Trash2} label={t.deleteSelection} onClick={() => handleAction(deleteSelection)} theme={theme} danger />
             
             <div className="h-[1px] bg-border my-1 mx-1 opacity-20" />
             
-            <ContextMenuItem icon={LucideIcons.ArrowUpToLine} label="Bring to Top" onClick={() => handleAction(() => {
+            <ContextMenuItem icon={LucideIcons.ArrowUpToLine} label={t.bringToTop} onClick={() => handleAction(() => {
               if (isMultiSelect) selectedNodes.forEach(n => bringToFront(n.id));
               else bringToFront(id);
             })} theme={theme} />
-            <ContextMenuItem icon={LucideIcons.ArrowDownToLine} label="Send to Back" onClick={() => handleAction(() => {
+            <ContextMenuItem icon={LucideIcons.ArrowDownToLine} label={t.sendToBack} onClick={() => handleAction(() => {
               if (isMultiSelect) selectedNodes.forEach(n => sendToBack(n.id));
               else sendToBack(id);
             })} theme={theme} />
@@ -1523,16 +1641,16 @@ function ContextMenu({
         {isEdge && !isMultiSelect && (
           <>
              <div className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest text-text-dim opacity-50">Edge Actions</div>
-             <ContextMenuItem icon={LucideIcons.Trash2} label="Remove Connection" onClick={() => handleAction(() => deleteEdge(id))} theme={theme} danger />
+             <ContextMenuItem icon={LucideIcons.Trash2} label={t.removeConnection} onClick={() => handleAction(() => deleteEdge(id))} theme={theme} danger />
           </>
         )}
 
         {(isPane || (isMultiSelect && !id)) && (
           <>
              <div className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest text-text-dim opacity-50">Canvas Actions</div>
-             <ContextMenuItem icon={LucideIcons.Clipboard} label="Paste" onClick={() => handleAction(pasteSelection)} theme={theme} />
+             <ContextMenuItem icon={LucideIcons.Clipboard} label={t.paste} onClick={() => handleAction(pasteSelection)} theme={theme} />
              <ContextMenuItem icon={LucideIcons.LayoutGrid} label="Auto-Arrange" onClick={() => handleAction(() => useStore.getState().arrangeGrid('grid'))} theme={theme} />
-             <ContextMenuItem icon={LucideIcons.Maximize} label="Fit View" onClick={() => { onClick(); document.querySelector('.react-flow__controls-fitview')?.dispatchEvent(new MouseEvent('click', { bubbles: true })); }} theme={theme} />
+             <ContextMenuItem icon={LucideIcons.Maximize} label={t.fitView} onClick={() => { onClick(); document.querySelector('.react-flow__controls-fitview')?.dispatchEvent(new MouseEvent('click', { bubbles: true })); }} theme={theme} />
           </>
         )}
       </div>

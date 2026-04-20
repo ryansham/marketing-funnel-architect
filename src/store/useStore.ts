@@ -21,6 +21,7 @@ export const useStore = create<AppState>((set, get) => ({
   history: [],
   historyIndex: -1,
   theme: 'light',
+  lang: (typeof localStorage !== 'undefined' ? localStorage.getItem('fa_lang') || 'en' : 'en') as 'en' | 'zh-hk' | 'zh-cn',
   interactionMode: 'select',
   isConnecting: false,
   presets: JSON.parse(localStorage.getItem(PRESETS_KEY) || '[]'),
@@ -297,6 +298,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   setTheme: (theme: 'dark' | 'light') => set({ theme }),
+  setLang: (lang: 'en' | 'zh-hk' | 'zh-cn') => { localStorage.setItem('fa_lang', lang); set({ lang }); },
 
   importCampaign: (data: { nodes: any[]; edges: any[] }) => {
     get().pushHistory();

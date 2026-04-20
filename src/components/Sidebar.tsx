@@ -1,3 +1,49 @@
+// Sidebar uses translations from parent App's langDict
+// Import inline to avoid circular deps
+const sidebarLangDict = {
+  en: {
+    history: 'History',
+    architectMode: 'Architect Mode', architectModeDesc: {st.architectModeDesc},
+    channelSelection: 'Channel Selection', nodeNameTitle: 'Node Name / Title',
+    styleConfig: 'Style Configuration', visualAppearance: 'Visual Appearance',
+    fillColor: 'Fill Color', borderColor: 'Border Color', borderThickness: 'Border Thickness',
+    pageConfig: 'Page Configuration', pageTemplate: 'Page Template',
+    mediaToolkit: 'Media Toolkit', addModule: 'Add Module',
+    typographyLayout: 'Typography & Layout', alignment: 'Alignment',
+    titleSize: 'Title Size', fontFamily: 'Font Family',
+    spacingControls: 'Spacing Controls', letterSpacing: 'Letter Spacing', lineHeight: 'Line Height',
+    addNote: 'Add a note...', expandNote: 'Expand Note', collapseNote: 'Collapse Note',
+    group: 'Group', ungroup: 'Ungroup',
+  },
+  'zh-hk': {
+    history: '歷史記錄',
+    architectMode: '設計師模式', architectModeDesc: '選取畫布上的任何元素以設定其屬性。',
+    channelSelection: '頻道選擇', nodeNameTitle: '節點名稱／標題',
+    styleConfig: '樣式設定', visualAppearance: '視覺外觀',
+    fillColor: '填充顏色', borderColor: '邊框顏色', borderThickness: '邊框粗細',
+    pageConfig: '頁面設定', pageTemplate: '頁面模板',
+    mediaToolkit: '媒體工具包', addModule: '新增模組',
+    typographyLayout: '字型與排版', alignment: '對齊方式',
+    titleSize: '標題大小', fontFamily: '字型',
+    spacingControls: '間距控制', letterSpacing: '字距', lineHeight: '行距',
+    addNote: '新增備注…', expandNote: '展開備注', collapseNote: '收起備注',
+    group: '組合', ungroup: '取消組合',
+  },
+  'zh-cn': {
+    history: '历史记录',
+    architectMode: '设计师模式', architectModeDesc: '选择画布上的任何元素以配置其属性。',
+    channelSelection: '渠道选择', nodeNameTitle: '节点名称／标题',
+    styleConfig: '样式配置', visualAppearance: '视觉外观',
+    fillColor: '填充颜色', borderColor: '边框颜色', borderThickness: '边框粗细',
+    pageConfig: '页面配置', pageTemplate: '页面模板',
+    mediaToolkit: '媒体工具包', addModule: '添加模块',
+    typographyLayout: '字体与排版', alignment: '对齐方式',
+    titleSize: '标题大小', fontFamily: '字体',
+    spacingControls: '间距控制', letterSpacing: '字距', lineHeight: '行距',
+    addNote: '添加备注…', expandNote: '展开备注', collapseNote: '收起备注',
+    group: '组合', ungroup: '取消组合',
+  },
+} as const;
 import React from 'react';
 import { useStore } from '../store/useStore';
 import * as LucideIcons from 'lucide-react';
@@ -55,6 +101,8 @@ export default function Sidebar() {
     importCampaign
   } = useStore();
   
+  const lang = useStore((s) => (s as any).lang || 'en') as 'en' | 'zh-hk' | 'zh-cn';
+  const st = sidebarLangDict[lang] || sidebarLangDict['en'];
   const selectedNode = nodes.find(n => n.id === selectedNodeId);
 
   const handleExportJSON = () => {
@@ -93,7 +141,7 @@ export default function Sidebar() {
     <div className={cn("p-4 border-b space-y-3", theme === 'dark' ? "border-border" : "border-slate-200")}>
       {/* Undo / Redo */}
       <div className="flex items-center justify-between">
-        <span className="text-[10px] uppercase tracking-widest text-text-dim font-black opacity-60">History</span>
+        <span className="text-[10px] uppercase tracking-widest text-text-dim font-black opacity-60">{st.history}</span>
         <div className="flex items-center gap-1">
           <button
             onClick={undo}
@@ -125,7 +173,7 @@ export default function Sidebar() {
           )}>
             <Settings className="text-text-dim" size={32} />
           </div>
-          <h3 className={cn("font-semibold", theme === 'dark' ? "text-white" : "text-slate-900")}>Architect Mode</h3>
+          <h3 className={cn("font-semibold", theme === 'dark' ? "text-white" : "text-slate-900")}>{st.architectMode}</h3>
           <p className="text-text-dim text-[11px] mt-2 max-w-[200px]">Select any component on the canvas to configure its O2O properties.</p>
         </div>
       </div>
@@ -217,7 +265,7 @@ export default function Sidebar() {
       <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-32 scrollbar-hide">
         {selectedNode.type === 'marketing' && (
           <section className="space-y-4">
-            <span className="text-[10px] uppercase tracking-widest text-text-dim font-black block">Channel Selection</span>
+            <span className="text-[10px] uppercase tracking-widest text-text-dim font-black block">{st.channelSelection}</span>
             <div className="grid grid-cols-4 gap-2">
               {channelTypes.map(ct => (
                 <button
@@ -236,7 +284,7 @@ export default function Sidebar() {
               ))}
             </div>
             <div className="space-y-1.5 pt-4">
-              <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">Node Name / Title</label>
+              <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">{st.nodeNameTitle}</label>
               <input 
                 type="text"
                 className={cn(
@@ -277,10 +325,10 @@ export default function Sidebar() {
 
         {isLandingNode && (
           <section className="space-y-4 animate-in fade-in slide-in-from-right-2 duration-300">
-             <span className="text-[10px] uppercase tracking-widest text-text-dim font-black block">Page Configuration</span>
+             <span className="text-[10px] uppercase tracking-widest text-text-dim font-black block">{st.pageConfig}</span>
              <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">Page Template</label>
+                  <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">{st.pageTemplate}</label>
                   <select 
                     className={cn(
                       "w-full border rounded px-3 py-2 text-xs font-bold outline-none focus:border-accent transition-all",
@@ -315,10 +363,10 @@ export default function Sidebar() {
 
         {(isTextNode || isTitleNode || selectedNode.type === 'free-text') && (
           <section className="space-y-4">
-            <span className="text-[10px] uppercase tracking-widest text-text-dim font-black block">Typography & Layout</span>
+            <span className="text-[10px] uppercase tracking-widest text-text-dim font-black block">{st.typographyLayout}</span>
             <div className="space-y-4">
                 <div className="space-y-1.5">
-                   <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">Alignment</label>
+                   <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">{st.alignment}</label>
                    <div className="grid grid-cols-3 gap-1">
                       {['left', 'center', 'right'].map(align => (
                         <button 
@@ -338,7 +386,7 @@ export default function Sidebar() {
                 </div>
                 {isTitleNode && (
                   <div className="space-y-1.5">
-                    <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">Title Size</label>
+                    <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">{st.titleSize}</label>
                     <div className="grid grid-cols-6 gap-1">
                       {['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].map(h => (
                         <button 
@@ -371,11 +419,11 @@ export default function Sidebar() {
                   </div>
                 )}
                 <div className="space-y-1.5 pt-4 border-t border-border/10">
-                  <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">Spacing Controls</label>
+                  <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">{st.spacingControls}</label>
                   <div className="space-y-4">
                     <div className="space-y-1">
                       <div className="flex justify-between items-center text-[10px] font-bold text-text-dim uppercase tracking-tighter">
-                        <span>Letter Spacing</span>
+                        <span>{st.letterSpacing}</span>
                         <span className="text-accent">{selectedNode.data.letterSpacing || 0}px</span>
                       </div>
                       <input 
@@ -390,7 +438,7 @@ export default function Sidebar() {
                     </div>
                     <div className="space-y-1">
                       <div className="flex justify-between items-center text-[10px] font-bold text-text-dim uppercase tracking-tighter">
-                        <span>Line Height</span>
+                        <span>{st.lineHeight}</span>
                         <span className="text-accent">{selectedNode.data.lineHeight || 1.2}</span>
                       </div>
                       <input 
@@ -411,13 +459,13 @@ export default function Sidebar() {
 
         {isShapedOrMarketing && (
           <section className="space-y-4">
-             <span className="text-[10px] uppercase tracking-widest text-text-dim font-black block">Style Configuration</span>
+             <span className="text-[10px] uppercase tracking-widest text-text-dim font-black block">{st.styleConfig}</span>
              <div className="space-y-4">
                 <div className="space-y-1.5">
-                   <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">Visual Appearance</label>
+                   <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">{st.visualAppearance}</label>
                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-1">
-                         <span className="text-[8px] font-bold text-text-dim uppercase tracking-tight">Fill Color</span>
+                         <span className="text-[8px] font-bold text-text-dim uppercase tracking-tight">{st.fillColor}</span>
                          <input 
                             type="color" 
                             className="w-full h-8 bg-transparent cursor-pointer rounded overflow-hidden p-0 border-none"
@@ -426,7 +474,7 @@ export default function Sidebar() {
                          />
                       </div>
                       <div className="space-y-1">
-                         <span className="text-[8px] font-bold text-text-dim uppercase tracking-tight">Border Color</span>
+                         <span className="text-[8px] font-bold text-text-dim uppercase tracking-tight">{st.borderColor}</span>
                          <input 
                             type="color" 
                             className="w-full h-8 bg-transparent cursor-pointer rounded overflow-hidden p-0 border-none"
@@ -438,7 +486,7 @@ export default function Sidebar() {
                 </div>
                 <div className="space-y-1.5">
                    <div className="flex justify-between items-center">
-                      <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">Border Thickness</label>
+                      <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">{st.borderThickness}</label>
                       <div className="flex items-center gap-2">
                         <button 
                           onClick={() => updateNodeData(selectedNodeId!, { strokeWidth: Math.max(1, (selectedNode.data.strokeWidth || 2) - 1) })}
@@ -473,7 +521,7 @@ export default function Sidebar() {
 
         {isLandingNode && (
           <section className={cn("pt-8 border-t", theme === 'dark' ? "border-border" : "border-slate-100")}>
-            <span className="text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 block">Media Toolkit</span>
+            <span className="text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 block">{st.mediaToolkit}</span>
             <div className="grid grid-cols-3 gap-2">
               {moduleTemplates.map((template) => (
                 <button
