@@ -105,12 +105,12 @@ function useHighlight(id: string) {
   return useMemo(() => {
     if (!selectedNodeId) return { isHighlighted: false, isDimmed: false };
     if (selectedNodeId === id) return { isHighlighted: true, isDimmed: false };
-
     const connected = edges.some(
       (e) => (e.source === selectedNodeId && e.target === id) ||
              (e.target === selectedNodeId && e.source === id)
     );
-    return { isHighlighted: connected, isDimmed: true };
+    // No dimming — only highlight connected nodes, leave others normal
+    return { isHighlighted: connected, isDimmed: false };
   }, [selectedNodeId, id, edges]);
 }
 
@@ -148,7 +148,10 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
   const customIconName = data.customIcon || (channelData ? channelData.icon : (data.icon || 'HelpCircle'));
   const Icon           = (LucideIcons as any)[customIconName] || LucideIcons.HelpCircle;
   const accentColor    = data.strokeColor || (channelData ? channelData.color : config.accent);
-  const bgColor        = data.fillColor   || (theme === 'dark' ? 'rgb(30, 41, 59)' : 'rgb(255, 255, 255)');
+  // Use subtle brand tint for channel cards, or explicit fillColor, or default
+  const defaultBg = theme === 'dark' ? 'rgb(30, 41, 59)' : 'rgb(255, 255, 255)';
+  const brandTint = channelData ? `${channelData.color}12` : null; // 12 = ~7% opacity hex
+  const bgColor   = data.fillColor || (isDiscovery && brandTint ? brandTint : defaultBg);
 
   const isDiscovery = data.type === 'discovery';
   const isAds       = data.primaryChannel === 'google-ads' ||
@@ -166,7 +169,7 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
         isDiscovery ? 'rounded-full px-6 py-3' : 'rounded-xl',
         isDiscovery ? 'min-w-[180px]' : 'w-[220px]',
         isAds && 'border-2',
-        isDimmed && !isHighlighted ? 'opacity-25 scale-[0.98]' : 'opacity-100',
+        // dimming removed for better UX
         isHighlighted && !selected  ? 'scale-[1.03]' : '',
         selected                    ? 'scale-[1.02]' : 'hover:scale-[1.01]',
       )}
@@ -275,10 +278,11 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
 
 // ─── WireframeModule ───────────────────────────────────────────────────────────
 
-const WireframeModule = ({ type, theme }: { type: string; theme: 'dark' | 'light' }) => {
+const WireframeModule = ({ type, label, theme }: { type: string; label?: string; theme: 'dark' | 'light' }) => {
   const isDark      = theme === 'dark';
   const strokeColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)';
   const fillColor   = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)';
+  const displayName = label || type;
 
   switch (type) {
     case 'Hero':
@@ -291,14 +295,14 @@ const WireframeModule = ({ type, theme }: { type: string; theme: 'dark' | 'light
             </svg>
           </div>
           <LucideIcons.Image size={12} className="text-accent opacity-20" />
-          <span className="text-[5px] font-black uppercase tracking-tighter mt-0.5 opacity-40">Hero</span>
+          <span className="text-[5px] font-black uppercase tracking-tighter mt-0.5 opacity-60">{displayName}</span>
         </div>
       );
     case 'CTA':
       return (
         <div className="w-full flex flex-col items-center gap-1 py-2 mb-1">
           <div className="w-2/3 h-1 rounded-full" style={{ backgroundColor: strokeColor }} />
-          <div className="w-1/2 h-3.5 rounded bg-accent flex items-center justify-center text-[5px] font-black uppercase text-bg">CTA / BUTTON</div>
+          <div className="w-1/2 h-3.5 rounded bg-accent flex items-center justify-center text-[5px] font-black uppercase text-bg">{displayName}</div>
         </div>
       );
     case 'Features':
@@ -313,13 +317,13 @@ const WireframeModule = ({ type, theme }: { type: string; theme: 'dark' | 'light
               <div className="w-2/3 h-0.5 rounded-full opacity-50" style={{ backgroundColor: strokeColor }} />
             </div>
           ))}
-          <div className="col-span-2 text-center text-[4px] font-black opacity-30 uppercase">Features Section</div>
+          <div className="col-span-2 text-center text-[4px] font-black opacity-50 uppercase">{displayName}</div>
         </div>
       );
     case 'FAQ':
       return (
         <div className="space-y-1 mb-1 p-1 border rounded" style={{ borderColor: strokeColor, backgroundColor: fillColor }}>
-          <div className="text-[4px] font-black opacity-30 uppercase mb-1">FAQ / Accordion</div>
+          <div className="text-[4px] font-black opacity-50 uppercase mb-1">{displayName}</div>
           {[1,2].map(i => (
             <div key={i} className="border-b py-1 flex items-center justify-between last:border-0" style={{ borderColor: strokeColor }}>
               <div className="w-2/3 h-0.5 rounded-full" style={{ backgroundColor: strokeColor }} />
@@ -333,7 +337,7 @@ const WireframeModule = ({ type, theme }: { type: string; theme: 'dark' | 'light
         <div className="p-2 border rounded-lg flex flex-col items-center gap-1 mb-1" style={{ borderColor: strokeColor, backgroundColor: fillColor }}>
           <div className="w-3/4 h-1 rounded-full" style={{ backgroundColor: strokeColor }} />
           <div className="w-full h-4 rounded border mt-0.5" style={{ borderColor: strokeColor, backgroundColor: isDark ? 'black' : 'white' }} />
-          <div className="w-full h-4 rounded bg-accent text-[5px] font-black text-white flex items-center justify-center uppercase">Subscribe</div>
+          <div className="w-full h-4 rounded bg-accent text-[5px] font-black text-white flex items-center justify-center uppercase">{displayName}</div>
         </div>
       );
     default:
@@ -344,7 +348,7 @@ const WireframeModule = ({ type, theme }: { type: string; theme: 'dark' | 'light
             <div className="w-1/2 h-0.5 rounded-full" style={{ backgroundColor: strokeColor }} />
             <div className="w-1/3 h-0.5 rounded-full opacity-50" style={{ backgroundColor: strokeColor }} />
           </div>
-          <span className="text-[4px] font-black uppercase opacity-20">{type}</span>
+          <span className="text-[4px] font-black uppercase opacity-50">{displayName}</span>
         </div>
       );
   }
@@ -367,7 +371,7 @@ export const LandingPageNode = memo(({ id, data, selected }: any) => {
         'rounded-[32px] border transition-all duration-200 shadow-2xl relative flex flex-col p-1.5',
         theme === 'dark' ? 'bg-slate-950 border-white/10' : 'bg-slate-100 border-slate-300',
         selected         ? 'ring-2 ring-accent scale-[1.02] z-50'  : 'hover:border-slate-500 hover:scale-[1.01]',
-        isDimmed && !isHighlighted ? 'opacity-25' : 'opacity-100',
+        // dimming removed
         isHighlighted && !selected ? 'ring-2 ring-purple-400 scale-[1.03]' : '',
       )}
       style={{ width: data.width || 180, height: data.height || 320 }}
@@ -398,7 +402,7 @@ export const LandingPageNode = memo(({ id, data, selected }: any) => {
         </div>
         <div className="flex-1 p-3 space-y-4 overflow-y-auto scrollbar-hide">
           {data.mockupModules?.length ? data.mockupModules.map((m: any) => (
-            <WireframeModule key={m.id} type={m.type} theme={theme} />
+            <WireframeModule key={m.id} type={m.type} label={m.label} theme={theme} />
           )) : (
             <div className={cn('h-full flex flex-col items-center justify-center opacity-10 gap-2', theme === 'dark' ? 'text-white' : 'text-slate-900')}>
               <LucideIcons.Globe size={24} />
@@ -425,7 +429,7 @@ export const StickyNoteNode = memo(({ id, data, selected }: any) => {
       className={cn(
         'bg-[#fefce8] p-1 shadow-lg relative transition-all group flex flex-col cursor-text',
         selected ? 'ring-2 ring-yellow-400 rotate-0 z-50 border-yellow-200' : '-rotate-1 border border-yellow-200',
-        isDimmed && !isHighlighted ? 'opacity-25' : '',
+        // dimming removed
         isHighlighted && !selected ? 'ring-2 ring-yellow-300 scale-[1.02]' : '',
       )}
       style={{ width: data.width || 220, height: data.height || 180 }}

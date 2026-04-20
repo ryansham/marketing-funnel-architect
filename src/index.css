@@ -186,10 +186,18 @@ body {
 .is-exporting .react-flow__handle,
 .is-exporting .react-flow__node-resizer,
 .is-exporting .react-flow__nodesselection-rect,
-.is-exporting .react-flow__panel {
+.is-exporting .react-flow__panel,
+.is-exporting [title="Bring to Front"],
+.is-exporting [title="Send to Back"],
+.is-exporting .react-flow__edge-label-renderer .nodrag {
   display: none !important;
 }
 
 .is-exporting .react-flow__node {
   box-shadow: none !important;
+}
+
+/* Shape node: hide border frame in export (show fill only) */
+.is-exporting .react-flow__node-shape .rounded-sm {
+  border-color: transparent !important;
 }

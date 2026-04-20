@@ -261,27 +261,52 @@ export default function App() {
       return;
     }
 
+    // Expand selection to include directly connected nodes
+    const selectedIds = new Set(selectedNodes.map(n => n.id));
+    const connectedIds = new Set<string>();
+    edges.forEach(e => {
+      if (selectedIds.has(e.source)) connectedIds.add(e.target);
+      if (selectedIds.has(e.target)) connectedIds.add(e.source);
+    });
+    const exportNodes = nodes.filter(n => selectedIds.has(n.id) || connectedIds.has(n.id));
+
     try {
       container.classList.add('is-exporting');
       const { toPng, toBlob } = await import('html-to-image');
       
-      // Calculate bounding box of selection
-      const padding = 40;
-      const minX = Math.min(...selectedNodes.map(n => n.position.x));
-      const minY = Math.min(...selectedNodes.map(n => n.position.y));
-      const maxX = Math.max(...selectedNodes.map(n => n.position.x + (n.width ?? 220)));
-      const maxY = Math.max(...selectedNodes.map(n => n.position.y + (n.height ?? 100)));
+      const padding = 60;
+      const minX = Math.min(...exportNodes.map(n => n.position.x));
+      const minY = Math.min(...exportNodes.map(n => n.position.y));
+      const maxX = Math.max(...exportNodes.map(n => n.position.x + (n.width ?? 220)));
+      const maxY = Math.max(...exportNodes.map(n => n.position.y + (n.height ?? 100)));
       
-      const width = (maxX - minX) + padding * 2;
+      const width  = (maxX - minX) + padding * 2;
       const height = (maxY - minY) + padding * 2;
+
+      const bgColor = theme === 'dark' ? '#020617' : '#ffffff';
 
       const options = {
         width,
         height,
+        backgroundColor: bgColor,
+        pixelRatio: 2,
         style: {
           width: `${width}px`,
           height: `${height}px`,
           transform: `translate(${-minX + padding}px, ${-minY + padding}px)`,
+        },
+        filter: (node: HTMLElement) => {
+          // Strip UI-only elements from the export
+          const cls = node.className || '';
+          if (typeof cls !== 'string') return true;
+          if (cls.includes('react-flow__handle')) return false;
+          if (cls.includes('react-flow__node-resizer')) return false;
+          if (cls.includes('react-flow__edge-label')) return false;
+          if (cls.includes('nodrag') && cls.includes('nopan')) return false; // edge action buttons
+          // Hide the floating layer-control toolbar on nodes
+          if (node.getAttribute && node.getAttribute('title') === 'Bring to Front') return false;
+          if (node.getAttribute && node.getAttribute('title') === 'Send to Back') return false;
+          return true;
         },
       };
 
@@ -290,12 +315,11 @@ export default function App() {
         if (blob) {
           const item = new ClipboardItem({ 'image/png': blob });
           await navigator.clipboard.write([item]);
-          alert('Polished selection copied to clipboard');
         }
       } else {
         const dataUrl = await toPng(renderer, options);
         const link = document.createElement('a');
-        link.download = `funnel-architect-selection-${Date.now()}.png`;
+        link.download = `funnel-export-${Date.now()}.png`;
         link.href = dataUrl;
         link.click();
       }
@@ -378,6 +402,14 @@ export default function App() {
         fillColor: reactFlowType === 'shape' ? '#38bdf8' : undefined,
         strokeColor: reactFlowType === 'shape' ? '#38bdf8' : undefined,
         strokeWidth: reactFlowType === 'shape' ? 2 : undefined,
+        // Ads channels get their brand fill color
+        ...(extraData.primaryChannel === 'google-ads' ? { fillColor: 'rgba(66,133,244,0.08)', strokeColor: '#4285F4' } : {}),
+        ...(extraData.primaryChannel === 'facebook' ? { fillColor: 'rgba(24,119,242,0.08)', strokeColor: '#1877F2' } : {}),
+        ...(extraData.primaryChannel === 'instagram' ? { fillColor: 'rgba(228,64,95,0.08)', strokeColor: '#E4405F' } : {}),
+        ...(extraData.primaryChannel === 'youtube' ? { fillColor: 'rgba(255,0,0,0.08)', strokeColor: '#FF0000' } : {}),
+        ...(extraData.primaryChannel === 'whatsapp' ? { fillColor: 'rgba(37,211,102,0.08)', strokeColor: '#25D366' } : {}),
+        ...(extraData.primaryChannel === 'tiktok' ? { fillColor: 'rgba(1,1,1,0.06)', strokeColor: '#010101' } : {}),
+        ...(extraData.primaryChannel === 'wechat' ? { fillColor: 'rgba(7,193,96,0.08)', strokeColor: '#07C160' } : {}),
         ...extraData
       },
     };
@@ -411,10 +443,24 @@ export default function App() {
         data: { label: 'Email Confirmation', type: 'discovery', primaryChannel: 'email', volume: 0, ctr: 0, cpc: 0 } },
     ];
 
+    const titleId = 'preset-title-' + timestamp;
+    const notesId = 'preset-notes-' + timestamp;
+
+    // Add title + notes above the flow
+    newNodes.push(
+      { id: titleId, type: 'title', position: { x: 80, y: 10 },
+        data: { label: 'Campaign Name', label2: 'Objective: ', type: 'title',
+          fontFamily: 'Montserrat', textAlign: 'left', volume: 0, ctr: 0, cpc: 0 } },
+      { id: notesId, type: 'text', position: { x: 600, y: 18 },
+        data: { label: 'Marketing Notes', note: '<p>Add campaign notes here...</p>', type: 'text',
+          fontFamily: 'Roboto', fontSize: 14, volume: 0, ctr: 0, cpc: 0,
+          width: 380, height: 60 } }
+    );
+
     const newEdges = [
-      { id: `e-${fbId}-${landingId}`, source: fbId, target: landingId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
-      { id: `e-${landingId}-${formId}`, source: landingId, target: formId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
-      { id: `e-${formId}-${emailId}`, source: formId, target: emailId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+      { id: `e-${fbId}-${landingId}`, source: fbId, target: landingId, sourceHandle: 'right', targetHandle: 'left', type: 'smoothstep' },
+      { id: `e-${landingId}-${formId}`, source: landingId, target: formId, sourceHandle: 'right', targetHandle: 'left', type: 'smoothstep' },
+      { id: `e-${formId}-${emailId}`, source: formId, target: emailId, sourceHandle: 'right', targetHandle: 'left', type: 'smoothstep' },
     ];
 
     setNodes(newNodes);
@@ -755,6 +801,8 @@ export default function App() {
 
           <MiniMap
             nodeStrokeWidth={3}
+            zoomable
+            pannable
             nodeColor={(n) => {
               if (n.type === 'marketing') return n.data?.primaryChannel === 'facebook' ? '#1877F2' : '#3b82f6';
               if (n.type === 'landing') return '#a855f7';
@@ -766,41 +814,29 @@ export default function App() {
               "!rounded-xl !border !shadow-2xl",
               theme === 'dark' ? "!bg-slate-900 !border-white/10" : "!bg-white !border-slate-200"
             )}
-            style={{ bottom: 80, right: 16 }}
           />
 
-          <Panel position="bottom-left" className="flex items-end gap-2 mb-2 ml-2">
+          <Panel position="bottom-left" className="flex items-end mb-2 ml-2">
              <div className={cn(
-               "flex flex-col rounded-xl border p-1 border-border shadow-2xl overflow-hidden",
+               "flex flex-row items-center rounded-xl border p-1 gap-0.5 border-border shadow-2xl",
                theme === 'dark' ? "bg-slate-900" : "bg-white"
              )}>
-                <button 
+                <button
                   onClick={() => setInteractionMode('select')}
-                  className={cn(
-                    "p-2 rounded-lg transition-all",
-                    interactionMode === 'select' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5"
-                  )}
+                  className={cn("p-2 rounded-lg transition-all", interactionMode === 'select' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")}
                   title="Selection Tool (V)"
-                >
-                  <LucideIcons.MousePointer2 size={18} />
-                </button>
-                <div className="h-[1px] bg-border my-1 mx-1 opacity-20" />
-                <button 
+                ><LucideIcons.MousePointer2 size={16} /></button>
+                <button
                   onClick={() => setInteractionMode('pan')}
-                  className={cn(
-                    "p-2 rounded-lg transition-all",
-                    interactionMode === 'pan' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5"
-                  )}
+                  className={cn("p-2 rounded-lg transition-all", interactionMode === 'pan' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")}
                   title="Hand Tool (H / Space)"
-                >
-                  <LucideIcons.Hand size={18} />
-                </button>
+                ><LucideIcons.Hand size={16} /></button>
+                <div className="w-[1px] h-5 bg-border mx-1 opacity-30" />
+                <Controls className={cn(
+                  "!static !m-0 !border-none !shadow-none !bg-transparent !overflow-visible !flex !flex-row !gap-0.5",
+                  theme === 'dark' ? "!fill-white" : "!fill-slate-600"
+                )} showInteractive={false} />
              </div>
-
-             <Controls className={cn(
-               "!static !m-0 !rounded-xl !border !shadow-2xl !overflow-hidden !flex !flex-col-reverse",
-               theme === 'dark' ? "!bg-slate-900 !border-border !fill-white" : "!bg-white !border-slate-200 !fill-slate-600"
-             )} />
           </Panel>
 
           {showGroupPanel && (
@@ -824,27 +860,12 @@ export default function App() {
             "flex gap-2 p-1.5 backdrop-blur rounded-xl border shadow-2xl m-4",
             theme === 'dark' ? "bg-sidebar/80 border-border" : "bg-white/80 border-slate-200"
           )}>
-            <div className="relative group/arrange">
-              <ToolbarBtn 
-                icon={LayoutGrid} 
-                label="Arrange" 
-                theme={theme}
-              />
-              <div className={cn(
-                "absolute top-full right-0 mt-1 p-1 border rounded-xl shadow-2xl opacity-0 scale-95 group-hover/arrange:opacity-100 group-hover/arrange:scale-100 transition-all pointer-events-none group-hover/arrange:pointer-events-auto w-32 z-[100]",
-                theme === 'dark' ? "bg-slate-950 border-white/10" : "bg-white border-slate-200"
-              )}>
-                 {['grid', 'horizontal', 'vertical', 'circular'].map(mode => (
-                   <button 
-                    key={mode} 
-                    onClick={() => arrangeGrid(mode as any)}
-                    className="w-full text-left px-3 py-2 text-[10px] font-black uppercase hover:bg-accent hover:text-bg rounded-lg transition-colors"
-                   >
-                     {mode}
-                   </button>
-                 ))}
-              </div>
-            </div>
+            <ToolbarBtn
+              icon={LayoutGrid}
+              label="Auto Arrange"
+              onClick={() => arrangeGrid('grid')}
+              theme={theme}
+            />
             <ToolbarBtn 
               icon={showNumbers ? Eye : EyeOff} 
               label={showNumbers ? "Hide Metrics" : "Show Metrics"} 
