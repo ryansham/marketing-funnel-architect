@@ -807,10 +807,20 @@ export default function App() {
             zoomable
             pannable
             nodeColor={(n) => {
-              if (n.type === 'marketing') return n.data?.primaryChannel === 'facebook' ? '#1877F2' : '#3b82f6';
+              if (n.type === 'marketing') {
+                const ch = n.data?.primaryChannel;
+                if (ch === 'facebook') return '#1877F2';
+                if (ch === 'instagram') return '#E4405F';
+                if (ch === 'whatsapp') return '#25D366';
+                if (ch === 'youtube') return '#FF0000';
+                if (ch === 'email') return '#6366f1';
+                return '#3b82f6';
+              }
               if (n.type === 'landing') return '#a855f7';
+              if (n.type === 'title') return '#64748b';
+              if (n.type === 'text') return '#94a3b8';
               if (n.type === 'shape') return '#38bdf8';
-              return '#94a3b8';
+              return '#cbd5e1';
             }}
             maskColor={theme === 'dark' ? 'rgba(2,6,23,0.7)' : 'rgba(248,250,252,0.7)'}
             className={cn(
