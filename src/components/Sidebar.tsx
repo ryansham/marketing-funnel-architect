@@ -27,6 +27,17 @@ import { MockupModule } from '../types';
 import MockupPreview from './MockupPreview';
 
 export default function Sidebar() {
+  const [collapsed, setCollapsed] = React.useState<Record<string,boolean>>({});
+  const toggle = (key: string) => setCollapsed(p => ({ ...p, [key]: !p[key] }));
+  const SectionHeader = ({ label, skey }: { label: string; skey: string }) => (
+    <button
+      onClick={() => toggle(skey)}
+      className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest font-black mb-3 opacity-50 hover:opacity-100 transition-opacity"
+    >
+      <span>{label}</span>
+      <LucideIcons.ChevronDown size={12} className={cn("transition-transform", collapsed[skey] && "rotate-180")} />
+    </button>
+  );
   const { 
     selectedNodeId, 
     nodes, 

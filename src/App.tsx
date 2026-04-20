@@ -116,6 +116,9 @@ export default function App() {
   } = useStore();
 
   const [spawnOffset, setSpawnOffset] = React.useState(0);
+  const [showMiniMap, setShowMiniMap] = React.useState(false);
+  const [leftCollapsed, setLeftCollapsed] = React.useState<Record<string,boolean>>({});
+  const [rightCollapsed, setRightCollapsed] = React.useState<Record<string,boolean>>({});
 
   // Set document title
   React.useEffect(() => { document.title = 'Marketing Funnel Architect'; }, []);
@@ -422,55 +425,75 @@ export default function App() {
   };
 
   const createDefaultSequence = () => {
-    const timestamp = Date.now();
-    const fbId = 'preset-fb-' + timestamp;
-    const landingId = 'preset-lp-' + timestamp;
-    const formId = 'preset-form-' + timestamp;
-    const emailId = 'preset-email-' + timestamp;
-    const bgId = 'bg-preset-' + timestamp;
+    const t = Date.now();
+    const metaId   = 'n-meta-'   + t;
+    const googleId = 'n-google-' + t;
+    const landingId= 'n-lp-'     + t;
+    const formId   = 'n-form-'   + t;
+    const emailId  = 'n-email-'  + t;
+    const waId     = 'n-wa-'     + t;
+    const titleId  = 'n-title-'  + t;
+
+    // Positions: left→right, vertically centered
+    // Meta Ads & Google Ads stacked at col 0, Landing at col 1 (center), Form at col 2, Email+WA at col 3 stacked
+    const X0 = 80, X1 = 440, X2 = 780, X3 = 1120;
+    const CY = 320; // vertical center
 
     const newNodes: any[] = [
-      // Background shape — acts as a visual group container without blocking clicks
-      { id: bgId, type: 'shape', position: { x: 80, y: 80 },
-        style: { width: 1320, height: 440, zIndex: -1 },
-        data: { label: 'Social Acquisition Flow', type: 'shape', shapeType: 'square',
-          fillColor: 'rgba(56,189,248,0.04)', strokeColor: '#38bdf8', strokeWidth: 1.5,
-          volume: 0, ctr: 0, cpc: 0 } },
-      { id: fbId, type: 'marketing', position: { x: 140, y: 250 },
-        data: { label: 'Facebook Ads', type: 'discovery', primaryChannel: 'facebook', volume: 10000, ctr: 3, cpc: 0.5 } },
-      { id: landingId, type: 'landing', position: { x: 420, y: 120 },
+      // ── Title card (top-left, left-aligned) ──────────────────────────────────
+      { id: titleId, type: 'title', position: { x: X0, y: 40 },
+        data: { label: 'Marketing Funnel', label2: 'Objective: Drive O2O conversions by attracting online audiences and guiding them to complete an offline action — from digital touchpoints to real-world engagement.',
+          type: 'title', fontFamily: 'Montserrat', textAlign: 'left', volume: 0, ctr: 0, cpc: 0 } },
+
+      // ── Ads layer (col 0) ─────────────────────────────────────────────────────
+      { id: metaId, type: 'marketing', position: { x: X0, y: CY - 80 },
+        data: { label: 'Meta Ads', type: 'discovery', primaryChannel: 'facebook',
+          volume: 15000, ctr: 3.2, cpc: 0.45,
+          note: 'Target interest-based audiences on Facebook & Instagram. Use carousel ads showcasing the campaign offer to drive awareness and clicks to the landing page.' } },
+      { id: googleId, type: 'marketing', position: { x: X0, y: CY + 120 },
+        data: { label: 'Google Ads', type: 'discovery', primaryChannel: 'google-ads',
+          volume: 12000, ctr: 4.1, cpc: 0.62,
+          note: 'Capture high-intent users via Search & Display. Bid on branded and category keywords to intercept users actively searching for relevant offers.' } },
+
+      // ── Landing Page (col 1, center) ──────────────────────────────────────────
+      { id: landingId, type: 'landing', position: { x: X1, y: CY - 150 },
         data: { label: 'Campaign Page', type: 'owned', pageType: 'Static Page',
-          mockupModules: [{ id: 'm1', type: 'Hero', content: {} }, { id: 'm2', type: 'CTA', content: {} }, { id: 'm3', type: 'Subscription', content: {} }] } },
-      { id: formId, type: 'marketing', position: { x: 740, y: 250 },
-        data: { label: 'Registration Form', type: 'discovery', primaryChannel: 'form', volume: 0, ctr: 0, cpc: 0 } },
-      { id: emailId, type: 'marketing', position: { x: 1060, y: 250 },
-        data: { label: 'Email Confirmation', type: 'discovery', primaryChannel: 'email', volume: 0, ctr: 0, cpc: 0 } },
+          mockupModules: [
+            { id: 'm1', type: 'Hero', label: 'Hero Banner' },
+            { id: 'm2', type: 'CTA',  label: 'CTA Button' },
+            { id: 'm3', type: 'Subscription', label: 'Lead Capture' },
+          ] } },
+
+      // ── Registration Form (col 2) ─────────────────────────────────────────────
+      { id: formId, type: 'marketing', position: { x: X2, y: CY - 20 },
+        data: { label: 'Registration Form', type: 'discovery', primaryChannel: 'form',
+          volume: 0, ctr: 0, cpc: 0,
+          note: 'Collect essential lead data: name, phone, email. Keep form fields minimal (3–5 fields) to maximise completion rate. Add a compelling incentive (e.g. exclusive gift) above the form.' } },
+
+      // ── Confirmations (col 3, stacked) ────────────────────────────────────────
+      { id: emailId, type: 'marketing', position: { x: X3, y: CY - 120 },
+        data: { label: 'Email Confirmation', type: 'discovery', primaryChannel: 'email',
+          volume: 0, ctr: 0, cpc: 0,
+          note: 'Send an automated confirmation email immediately after registration. Include: campaign details, redemption instructions, event date/location, and a QR code for offline check-in.' } },
+      { id: waId, type: 'marketing', position: { x: X3, y: CY + 80 },
+        data: { label: 'WhatsApp Confirmation', type: 'discovery', primaryChannel: 'whatsapp',
+          volume: 0, ctr: 0, cpc: 0,
+          note: 'Follow up via WhatsApp for higher open rates (>90%). Send a reminder 24h before the event with the redemption QR code. Consider a chatbot flow for FAQs and upsell.' } },
     ];
 
-    const titleId = 'preset-title-' + timestamp;
-    const notesId = 'preset-notes-' + timestamp;
-
-    // Add title + notes above the flow
-    newNodes.push(
-      { id: titleId, type: 'title', position: { x: 80, y: 10 },
-        data: { label: 'Campaign Name', label2: 'Objective: ', type: 'title',
-          fontFamily: 'Montserrat', textAlign: 'left', volume: 0, ctr: 0, cpc: 0 } },
-      { id: notesId, type: 'text', position: { x: 600, y: 18 },
-        data: { label: 'Marketing Notes', note: '<p>Add campaign notes here...</p>', type: 'text',
-          fontFamily: 'Roboto', fontSize: 14, volume: 0, ctr: 0, cpc: 0,
-          width: 380, height: 60 } }
-    );
-
-    const newEdges = [
-      { id: `e-${fbId}-${landingId}`, source: fbId, target: landingId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
-      { id: `e-${landingId}-${formId}`, source: landingId, target: formId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
-      { id: `e-${formId}-${emailId}`, source: formId, target: emailId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+    const newEdges: any[] = [
+      // Both ads → landing
+      { id: `e-meta-lp`,   source: metaId,   target: landingId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+      { id: `e-google-lp`, source: googleId,  target: landingId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+      // Landing → Form
+      { id: `e-lp-form`,   source: landingId, target: formId,    sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+      // Form → both confirmations
+      { id: `e-form-email`,source: formId,    target: emailId,   sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+      { id: `e-form-wa`,   source: formId,    target: waId,      sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
     ];
 
     setNodes(newNodes);
     setEdges(newEdges);
-    // Push bg shape to back so cards render on top and are clickable
-    setTimeout(() => useStore.getState().sendToBack(bgId), 50);
   };
 
   const handleExportJSON = () => {
@@ -533,6 +556,12 @@ export default function App() {
     } catch (err) {
       console.error('Export failed', err);
     }
+  };
+
+  // Collapsible section toggle helper
+  const toggleSection = (side: 'left' | 'right', key: string) => {
+    if (side === 'left') setLeftCollapsed(p => ({ ...p, [key]: !p[key] }));
+    else setRightCollapsed(p => ({ ...p, [key]: !p[key] }));
   };
 
   return (
@@ -607,7 +636,11 @@ export default function App() {
         theme === 'dark' ? "bg-sidebar border-border" : "bg-white border-slate-200"
       )}>
         <section>
-          <span className="text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 block opacity-50">Discovery Channels</span>
+          <button onClick={() => toggleSection('left','discovery')} className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 opacity-50 hover:opacity-100 transition-opacity">
+            <span>Discovery Channels</span>
+            <LucideIcons.ChevronDown size={12} className={cn("transition-transform", leftCollapsed['discovery'] && "rotate-180")} />
+          </button>
+          {!leftCollapsed['discovery'] && <>
           <div className="space-y-2">
             <ToolkitItem 
               icon={Search} 
@@ -683,17 +716,27 @@ export default function App() {
               theme={theme}
             />
           </div>
+          </>}
         </section>
 
         <section>
-          <span className="text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 block opacity-50">Landing Page</span>
+          <button onClick={() => toggleSection('left','landing')} className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 opacity-50 hover:opacity-100 transition-opacity">
+            <span>Landing Page</span>
+            <LucideIcons.ChevronDown size={12} className={cn("transition-transform", leftCollapsed['landing'] && "rotate-180")} />
+          </button>
+          {!leftCollapsed['landing'] && <>
           <div className="space-y-2">
             <ToolkitItem icon={Globe} label="Landing Page" color="bg-owned" onClick={() => addNode('owned', 'Campaign Page', 'landing', { pageType: 'Static Page', mockupModules: [{ id: 'm1', type: 'Hero' }, { id: 'm2', type: 'CTA' }, { id: 'm3', type: 'Subscription' }] })} theme={theme} />
           </div>
+          </>}
         </section>
 
         <section>
-          <span className="text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 block opacity-50">Tools & Visuals</span>
+          <button onClick={() => toggleSection('left','tools')} className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 opacity-50 hover:opacity-100 transition-opacity">
+            <span>Tools &amp; Visuals</span>
+            <LucideIcons.ChevronDown size={12} className={cn("transition-transform", leftCollapsed['tools'] && "rotate-180")} />
+          </button>
+          {!leftCollapsed['tools'] && <>
           <div className="space-y-2">
             <ToolkitItem icon={Heading1} label="Large Title" color="bg-accent" onClick={() => addNode('title', 'Headline', 'title', { titleType: 'h1', textAlign: 'center', label2: 'Objective: ' })} theme={theme} />
             <ToolkitItem icon={Type} label="Marketing Notes" color="bg-slate-400" onClick={() => addNode('text', 'Marketing notes...', 'text', { fontFamily: 'Roboto', fontSize: 18 })} theme={theme} />
@@ -726,10 +769,15 @@ export default function App() {
                 <LucideIcons.MoreHorizontal size={12} /> Dotted
              </button>
           </div>
+          </>}
         </section>
 
         <section className="mt-auto pt-6 border-t border-border/10">
-          <span className="text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 block opacity-50">Marketing Presets</span>
+          <button onClick={() => toggleSection('left','presets')} className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 opacity-50 hover:opacity-100 transition-opacity">
+            <span>Marketing Presets</span>
+            <LucideIcons.ChevronDown size={12} className={cn("transition-transform", leftCollapsed['presets'] && "rotate-180")} />
+          </button>
+          {!leftCollapsed['presets'] && <>
           <div className="space-y-2">
             <ToolkitItem 
               icon={Layers} 
@@ -758,6 +806,7 @@ export default function App() {
               + Save current as preset
             </button>
           </div>
+          </>}
         </section>
       </aside>
       
@@ -802,7 +851,7 @@ export default function App() {
             lineWidth={0.5}
           />
 
-          <MiniMap
+          {showMiniMap && <MiniMap
             nodeStrokeWidth={3}
             zoomable
             pannable
@@ -827,28 +876,26 @@ export default function App() {
               "!rounded-xl !border !shadow-2xl",
               theme === 'dark' ? "!bg-slate-900 !border-white/10" : "!bg-white !border-slate-200"
             )}
-          />
+          />}
 
           <Panel position="bottom-left" className="flex items-end mb-2 ml-2">
              <div className={cn(
                "flex flex-row items-center rounded-xl border p-1 gap-0.5 border-border shadow-2xl",
                theme === 'dark' ? "bg-slate-900" : "bg-white"
              )}>
-                <button
-                  onClick={() => setInteractionMode('select')}
-                  className={cn("p-2 rounded-lg transition-all", interactionMode === 'select' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")}
-                  title="Selection Tool (V)"
-                ><LucideIcons.MousePointer2 size={16} /></button>
-                <button
-                  onClick={() => setInteractionMode('pan')}
-                  className={cn("p-2 rounded-lg transition-all", interactionMode === 'pan' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")}
-                  title="Hand Tool (H / Space)"
-                ><LucideIcons.Hand size={16} /></button>
+                {/* Tool mode */}
+                <button onClick={() => setInteractionMode('select')} className={cn("p-2 rounded-lg transition-all", interactionMode === 'select' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Selection Tool (V)"><LucideIcons.MousePointer2 size={16} /></button>
+                <button onClick={() => setInteractionMode('pan')} className={cn("p-2 rounded-lg transition-all", interactionMode === 'pan' ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Hand Tool (H / Space)"><LucideIcons.Hand size={16} /></button>
                 <div className="w-[1px] h-5 bg-border mx-1 opacity-30" />
-                <Controls className={cn(
-                  "!static !m-0 !border-none !shadow-none !bg-transparent !overflow-visible !flex !flex-row !gap-0.5",
-                  theme === 'dark' ? "!fill-white" : "!fill-slate-600"
-                )} showInteractive={false} />
+                {/* Zoom controls */}
+                <Controls className={cn("!static !m-0 !border-none !shadow-none !bg-transparent !overflow-visible !flex !flex-row !gap-0.5", theme === 'dark' ? "!fill-white" : "!fill-slate-600")} showInteractive={false} />
+                <div className="w-[1px] h-5 bg-border mx-1 opacity-30" />
+                {/* Auto Arrange */}
+                <button onClick={() => arrangeGrid('grid')} className="p-2 rounded-lg transition-all text-text-dim hover:bg-black/5" title="Auto Arrange"><LucideIcons.LayoutGrid size={16} /></button>
+                {/* Toggle Metrics */}
+                <button onClick={toggleNumbers} className="p-2 rounded-lg transition-all text-text-dim hover:bg-black/5" title={showNumbers ? "Hide Metrics" : "Show Metrics"}>{showNumbers ? <LucideIcons.Eye size={16} /> : <LucideIcons.EyeOff size={16} />}</button>
+                {/* MiniMap toggle */}
+                <button onClick={() => setShowMiniMap(v => !v)} className={cn("p-2 rounded-lg transition-all", showMiniMap ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Toggle MiniMap"><LucideIcons.Map size={16} /></button>
              </div>
           </Panel>
 
@@ -869,23 +916,7 @@ export default function App() {
             </Panel>
           )}
           
-          <Panel position="top-right" className={cn(
-            "flex gap-2 p-1.5 backdrop-blur rounded-xl border shadow-2xl m-4",
-            theme === 'dark' ? "bg-sidebar/80 border-border" : "bg-white/80 border-slate-200"
-          )}>
-            <ToolbarBtn
-              icon={LayoutGrid}
-              label="Auto Arrange"
-              onClick={() => arrangeGrid('grid')}
-              theme={theme}
-            />
-            <ToolbarBtn 
-              icon={showNumbers ? Eye : EyeOff} 
-              label={showNumbers ? "Hide Metrics" : "Show Metrics"} 
-              onClick={toggleNumbers} 
-              theme={theme}
-            />
-          </Panel>
+
 
           <ShortcutsHelper theme={theme} />
           {menu && <ContextMenu 

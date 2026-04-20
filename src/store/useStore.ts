@@ -312,66 +312,74 @@ export const useStore = create<AppState>((set, get) => ({
   arrangeGrid: (mode: 'grid' | 'horizontal' | 'vertical' | 'circular' = 'grid') => {
     get().pushHistory();
     const { nodes, edges } = get();
-    const arrangementExcludes = ['group'];
+    // Exclude non-flow nodes from arrangement
+    const arrangementExcludes = ['group', 'shape', 'title', 'text', 'image'];
     const cards = nodes.filter(n => !arrangementExcludes.includes(n.type || ''));
     const others = nodes.filter(n => arrangementExcludes.includes(n.type || ''));
-    
+
     if (cards.length === 0) return;
 
     const positions = new Map<string, { x: number, y: number }>();
 
-    if (mode === 'grid') {
-      const colWidth = 320;
-      const rowHeight = 300;
-      const margin = 100;
+    // Linear layout: follow edge connections left-to-right, vertically centered
+    const colGap = 300;  // horizontal gap between cards
+    const centerY = 400; // vertical center for all cards
+    const startX = 120;
+    const branchGap = 200; // vertical gap for branching nodes
 
-      const incomingEdgeCounts = new Map<string, number>();
-      edges.forEach(e => {
-        incomingEdgeCounts.set(e.target, (incomingEdgeCounts.get(e.target) || 0) + 1);
-      });
+    const incomingCount = new Map<string, number>();
+    edges.forEach(e => incomingCount.set(e.target, (incomingCount.get(e.target) || 0) + 1));
 
-      const roots = cards.filter(n => !incomingEdgeCounts.has(n.id));
-      const processed = new Set<string>();
-      let currentRow = 0;
+    const processed = new Set<string>();
+    let col = 0;
 
-      const arrangeBranch = (nodeId: string, col: number, row: number) => {
-        if (processed.has(nodeId)) return;
-        processed.add(nodeId);
-        positions.set(nodeId, { x: col * colWidth + margin, y: row * rowHeight + margin });
-        const children = edges.filter(e => e.source === nodeId).map(e => e.target).filter(id => cards.some(n => n.id === id));
-        children.forEach((childId, i) => arrangeBranch(childId, col + 1, row + i));
-      };
+    // BFS traversal from roots, keeping linear order
+    const queue: Array<{ id: string; col: number; row: number }> = [];
+    const roots = cards.filter(n => !incomingCount.has(n.id));
 
-      roots.forEach((root, i) => {
-        arrangeBranch(root.id, 0, currentRow + i);
-        currentRow += 1;
+    // If no roots (circular), just take first card
+    if (roots.length === 0 && cards.length > 0) roots.push(cards[0]);
+
+    roots.forEach((root, i) => queue.push({ id: root.id, col: 0, row: i }));
+
+    let maxCol = 0;
+    const rowAtCol = new Map<number, number>(); // track rows used at each col
+
+    while (queue.length > 0) {
+      const { id, col, row } = queue.shift()!;
+      if (processed.has(id)) continue;
+      processed.add(id);
+
+      const usedRow = rowAtCol.get(col) || 0;
+      const actualRow = Math.max(row, usedRow);
+      rowAtCol.set(col, actualRow + 1);
+
+      positions.set(id, {
+        x: startX + col * colGap,
+        y: centerY + actualRow * branchGap - (roots.length - 1) * branchGap / 2
       });
-      cards.forEach(n => {
-        if (!processed.has(n.id)) {
-          arrangeBranch(n.id, 0, currentRow);
-          currentRow += 1;
-        }
-      });
-    } else if (mode === 'horizontal') {
-      cards.forEach((n, i) => positions.set(n.id, { x: i * 350 + 100, y: 100 }));
-    } else if (mode === 'vertical') {
-      cards.forEach((n, i) => positions.set(n.id, { x: 100, y: i * 250 + 100 }));
-    } else if (mode === 'circular') {
-      const radius = Math.max(400, cards.length * 80);
-      const centerX = radius + 200;
-      const centerY = radius + 200;
-      cards.forEach((n, i) => {
-         const angle = (i / cards.length) * 2 * Math.PI;
-         positions.set(n.id, {
-           x: centerX + radius * Math.cos(angle),
-           y: centerY + radius * Math.sin(angle)
-         });
-      });
+      maxCol = Math.max(maxCol, col);
+
+      const children = edges
+        .filter(e => e.source === id)
+        .map(e => e.target)
+        .filter(tid => cards.some(n => n.id === tid) && !processed.has(tid));
+
+      children.forEach((childId, i) => queue.push({ id: childId, col: col + 1, row: actualRow + i }));
     }
 
+    // Any unconnected cards go in a row below
+    let extraRow = 1;
+    cards.forEach(n => {
+      if (!processed.has(n.id)) {
+        positions.set(n.id, { x: startX + (maxCol + 1) * colGap, y: centerY + extraRow * branchGap });
+        extraRow++;
+      }
+    });
+
     const arrangedCards = cards.map(node => ({
-        ...node,
-        position: positions.get(node.id) || node.position
+      ...node,
+      position: positions.get(node.id) || node.position,
     }));
 
     set({ nodes: [...arrangedCards, ...others] });
