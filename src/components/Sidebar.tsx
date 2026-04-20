@@ -24,7 +24,6 @@ import {
 import { cn } from '../lib/utils';
 import { MockupModule } from '../types';
 
-import MockupPreview from './MockupPreview';
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = React.useState<Record<string,boolean>>({});
@@ -237,15 +236,7 @@ export default function Sidebar() {
     <div className="flex-1 flex flex-col h-full overflow-hidden">
       <GlobalActions />
       
-      {/* Mockup Editor Section (Only for Landing Pages) */}
-      {isLandingNode && (
-        <div className={cn("p-6 border-b space-y-4", theme === 'dark' ? "border-border" : "border-slate-100")}>
-          <span className="text-[10px] uppercase tracking-widest text-text-dim font-black">Live Preview</span>
-          <div className="scale-75 origin-top -mb-20">
-            <MockupPreview />
-          </div>
-        </div>
-      )}
+
 
       {/* Settings Section */}
       <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-32 scrollbar-hide">
