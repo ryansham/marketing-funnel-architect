@@ -111,31 +111,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Group / Ungroup */}
-      <div className="flex items-center gap-2">
-        <button
-          onClick={() => {
-            const selectedIds = nodes.filter(n => n.selected).map(n => n.id);
-            if (selectedIds.length > 1) createGroup(selectedIds);
-          }}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-[10px] font-black uppercase tracking-widest transition-all",
-            theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 shadow-sm hover:border-slate-300"
-          )}
-        >
-          <LucideIcons.Layers size={12} /> Group
-        </button>
-        <button
-          onClick={() => { if (selectedNode?.type === 'group') ungroup(selectedNode.id); }}
-          disabled={selectedNode?.type !== 'group'}
-          className={cn(
-            "flex-1 flex items-center justify-center gap-2 py-2 border rounded-lg text-[10px] font-black uppercase tracking-widest transition-all disabled:opacity-20",
-            theme === 'dark' ? "bg-white/5 border-border text-white hover:bg-white/10" : "bg-white border-slate-200 text-slate-700 shadow-sm hover:border-slate-300"
-          )}
-        >
-          <LucideIcons.Unlink size={12} /> Ungroup
-        </button>
-      </div>
+
     </div>
   );
 
@@ -378,25 +354,7 @@ export default function Sidebar() {
                     </div>
                   </div>
                 )}
-                <div className="space-y-1.5">
-                  <label className="text-[10px] font-black text-text-dim uppercase tracking-wider">Font Family</label>
-                  <select 
-                    className={cn(
-                      "w-full border rounded px-3 py-2 text-xs font-bold outline-none focus:border-accent transition-all",
-                      theme === 'dark' ? "bg-black/40 border-border text-white" : "bg-white border-slate-200 text-slate-900 shadow-sm"
-                    )}
-                    value={selectedNode.data.fontFamily || 'Dancing Script'}
-                    onChange={(e) => updateNodeData(selectedNodeId, { fontFamily: e.target.value })}
-                  >
-                    {fontGroups.map(group => (
-                      <optgroup key={group.label} label={group.label} className="bg-slate-900 text-white">
-                        {group.fonts.map(f => (
-                           <option key={f} value={f} style={{ fontFamily: f }} className={theme === 'dark' ? "bg-slate-900 text-white" : "bg-white text-slate-900"}>{f}</option>
-                        ))}
-                      </optgroup>
-                    ))}
-                  </select>
-                </div>
+
                 {!isTitleNode && (
                   <div className="space-y-1.5 pt-2">
                     <div className="flex justify-between items-center">

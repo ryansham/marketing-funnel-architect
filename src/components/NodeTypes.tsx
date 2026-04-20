@@ -162,6 +162,16 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
   const highlightShadow = `0 0 0 2px ${accentColor}80, 0 8px 24px -4px ${accentColor}30`;
   const defaultShadow   = `0 4px 16px -4px ${accentColor}20`;
 
+  // Benchmark data for channel tooltips
+  const BENCHMARKS: Record<string, {ctr:number;cpc:number}> = {
+    'facebook':{'ctr':0.9,'cpc':0.97},'instagram':{'ctr':0.8,'cpc':1.20},
+    'google-ads':{'ctr':3.17,'cpc':2.32},'youtube':{'ctr':0.5,'cpc':0.49},
+    'whatsapp':{'ctr':28.0,'cpc':0.05},'tiktok':{'ctr':1.0,'cpc':0.50},
+    'email':{'ctr':2.6,'cpc':0.10},'form':{'ctr':100,'cpc':0.0},
+    'wechat':{'ctr':5.0,'cpc':0.30},'outdoor':{'ctr':0.3,'cpc':5.0},
+  };
+  const bench = data.primaryChannel ? BENCHMARKS[data.primaryChannel] : null;
+
   return (
     <div
       className={cn(
@@ -237,12 +247,36 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
           </div>
         </div>
 
+        {/* Benchmark indicator for discovery/ads cards */}
+        {isDiscovery && bench && showNumbers && (
+          <div className="mt-1 text-[8px] font-mono opacity-40 text-center whitespace-nowrap">
+            avg CTR {bench.ctr}% · CPC ${bench.cpc}
+          </div>
+        )}
+
+        {/* Benchmark hover tooltip */}
+        {isDiscovery && bench && selected && (
+          <div className={cn(
+            'absolute -top-9 left-1/2 -translate-x-1/2 text-[9px] font-bold whitespace-nowrap px-2.5 py-1 rounded-full border z-50 pointer-events-none shadow-lg',
+            theme === 'dark' ? 'bg-slate-800 border-white/10 text-white/80' : 'bg-white border-slate-200 text-slate-600 shadow-sm'
+          )}>
+            ↑ Industry: CTR {bench.ctr}% · CPC ${bench.cpc}
+          </div>
+        )}
+
         {!isDiscovery && showNumbers && (
           <div className="flex flex-col gap-0.5">
             <div className="text-[9px] font-black text-text-dim uppercase tracking-wider opacity-50">Reach Potential</div>
             <div className={cn('text-sm font-bold tracking-tight', theme === 'dark' ? 'text-white' : 'text-slate-900')}>
               {data.volume.toLocaleString()}
             </div>
+          </div>
+        )}
+
+        {/* Discovery cards: show note below if set */}
+        {isDiscovery && data.note && (
+          <div className={cn('mt-1.5 text-[9px] leading-relaxed opacity-60 max-w-[200px] text-center whitespace-normal', theme === 'dark' ? 'text-white' : 'text-slate-700')}>
+            {data.note.length > 80 ? data.note.substring(0, 80) + '…' : data.note}
           </div>
         )}
 
@@ -467,9 +501,9 @@ export const TitleNode = memo(({ id, data, selected }: any) => {
         resize: selected ? 'both' : 'none',
         overflow: 'hidden',
         cursor: 'default',
+        transformOrigin: 'top left',  // pin resize to top-left
       }}
       onMouseUp={(e) => {
-        // Capture size after CSS resize
         const el = e.currentTarget;
         updateNodeData(id, { width: el.offsetWidth, height: el.offsetHeight });
       }}
@@ -697,35 +731,55 @@ const TitleFloatingToolbar = ({ id, data }: { id: string; data: any }) => {
   ];
 
   return (
-    <div className={cn('absolute bottom-full mb-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 p-1.5 border rounded-xl shadow-2xl z-50 animate-in fade-in zoom-in slide-in-from-bottom-2', theme === 'dark' ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200')} onPointerDown={(e) => e.stopPropagation()}>
-      <div className="flex flex-col gap-1 px-1">
-        <span className={cn('text-[7px] uppercase font-bold', theme === 'dark' ? 'text-white/40' : 'text-slate-400')}>Headline Font</span>
-        <select className={cn('text-[9px] border-none rounded px-1.5 h-5 font-bold outline-none cursor-pointer', theme === 'dark' ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-900')} value={data.fontFamily || 'Montserrat'} onChange={(e) => updateNodeData(id, { fontFamily: e.target.value })}>
-          {fontGroups.map(g => <optgroup key={g.label} label={g.label}>{g.fonts.map(f => <option key={f} value={f}>{f}</option>)}</optgroup>)}
-        </select>
+    <div
+      className={cn('absolute bottom-full mb-3 left-0 flex flex-wrap items-center gap-2 p-3 border rounded-2xl shadow-2xl z-50 animate-in fade-in zoom-in slide-in-from-bottom-2 min-w-max', theme === 'dark' ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200')}
+      onPointerDown={(e) => e.stopPropagation()}
+    >
+      {/* Font selectors */}
+      <div className="flex items-center gap-2">
+        <div className="flex flex-col gap-1">
+          <span className={cn('text-[9px] uppercase font-bold', theme === 'dark' ? 'text-white/40' : 'text-slate-400')}>Headline Font</span>
+          <select className={cn('text-[11px] border rounded px-2 py-1 font-bold outline-none cursor-pointer h-7', theme === 'dark' ? 'bg-white/10 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900')} value={data.fontFamily || 'Montserrat'} onChange={(e) => updateNodeData(id, { fontFamily: e.target.value })}>
+            {fontGroups.map(g => <optgroup key={g.label} label={g.label}>{g.fonts.map(f => <option key={f} value={f}>{f}</option>)}</optgroup>)}
+          </select>
+        </div>
+        <div className="flex flex-col gap-1">
+          <span className={cn('text-[9px] uppercase font-bold', theme === 'dark' ? 'text-white/40' : 'text-slate-400')}>Objective Font</span>
+          <select className={cn('text-[11px] border rounded px-2 py-1 font-bold outline-none cursor-pointer h-7', theme === 'dark' ? 'bg-white/10 border-white/10 text-white' : 'bg-slate-50 border-slate-200 text-slate-900')} value={data.fontFamily2 || 'Roboto'} onChange={(e) => updateNodeData(id, { fontFamily2: e.target.value })}>
+            {fontGroups.map(g => <optgroup key={g.label} label={g.label}>{g.fonts.map(f => <option key={f} value={f}>{f}</option>)}</optgroup>)}
+          </select>
+        </div>
       </div>
-      <div className={cn('h-6 w-[1px] mx-1', theme === 'dark' ? 'bg-white/10' : 'bg-slate-200')} />
-      <div className="flex flex-col gap-1 px-1">
-        <span className={cn('text-[7px] uppercase font-bold', theme === 'dark' ? 'text-white/40' : 'text-slate-400')}>Objective Font</span>
-        <select className={cn('text-[9px] border-none rounded px-1.5 h-5 font-bold outline-none cursor-pointer', theme === 'dark' ? 'bg-white/10 text-white' : 'bg-slate-100 text-slate-900')} value={data.fontFamily2 || 'Roboto'} onChange={(e) => updateNodeData(id, { fontFamily2: e.target.value })}>
-          {fontGroups.map(g => <optgroup key={g.label} label={g.label}>{g.fonts.map(f => <option key={f} value={f}>{f}</option>)}</optgroup>)}
-        </select>
+
+      <div className={cn('h-8 w-[1px]', theme === 'dark' ? 'bg-white/10' : 'bg-slate-200')} />
+
+      {/* Alignment */}
+      <div className="flex flex-col gap-1">
+        <span className={cn('text-[9px] uppercase font-bold', theme === 'dark' ? 'text-white/40' : 'text-slate-400')}>Align</span>
+        <div className={cn('flex items-center gap-1 rounded-lg p-1', theme === 'dark' ? 'bg-white/5' : 'bg-slate-50')}>
+          {(['left', 'center', 'right'] as const).map(align => (
+            <button key={align} onClick={() => updateNodeData(id, { textAlign: align })}
+              className={cn('p-1.5 rounded transition-all', (data.textAlign || 'left') === align ? 'text-accent bg-accent/10' : theme === 'dark' ? 'text-white/60 hover:bg-white/10' : 'text-slate-400 hover:bg-slate-200')}>
+              {align === 'left' ? <LucideIcons.AlignLeft size={14} /> : align === 'center' ? <LucideIcons.AlignCenter size={14} /> : <LucideIcons.AlignRight size={14} />}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className={cn('h-6 w-[1px] mx-1', theme === 'dark' ? 'bg-white/10' : 'bg-slate-200')} />
-      <div className={cn('flex items-center gap-1 rounded-lg p-1', theme === 'dark' ? 'bg-white/5' : 'bg-slate-50')}>
-        {(['left', 'center', 'right'] as const).map(align => (
-          <button key={align} onClick={() => updateNodeData(id, { textAlign: align })} className={cn('p-1 rounded', (data.textAlign || 'left') === align ? 'text-accent bg-accent/10' : theme === 'dark' ? 'text-white/60' : 'text-slate-400')}>
-            {align === 'left' ? <LucideIcons.AlignLeft size={12} /> : align === 'center' ? <LucideIcons.AlignCenter size={12} /> : <LucideIcons.AlignRight size={12} />}
-          </button>
-        ))}
-      </div>
-      <div className={cn('h-6 w-[1px] mx-1', theme === 'dark' ? 'bg-white/10' : 'bg-slate-200')} />
-      <div className="flex flex-col gap-1 px-1">
-        <span className={cn('text-[7px] uppercase font-bold', theme === 'dark' ? 'text-white/40' : 'text-slate-400')}>Spacing</span>
+
+      <div className={cn('h-8 w-[1px]', theme === 'dark' ? 'bg-white/10' : 'bg-slate-200')} />
+
+      {/* Spacing controls */}
+      <div className="flex flex-col gap-1">
+        <span className={cn('text-[9px] uppercase font-bold', theme === 'dark' ? 'text-white/40' : 'text-slate-400')}>Spacing</span>
         <div className="flex items-center gap-1">
-          <button onClick={() => updateNodeData(id, { letterSpacing: Math.min(10, (data.letterSpacing || 0) + 0.5) })} className={cn('p-1 rounded transition-colors', theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-200 text-slate-600')} title="Increase Tracking"><LucideIcons.ArrowLeftRight size={10} /></button>
-          <button onClick={() => updateNodeData(id, { lineHeight: Math.min(3, (data.lineHeight || 1.1) + 0.1) })} className={cn('p-1 rounded transition-colors', theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-200 text-slate-600')} title="Increase Leading"><LucideIcons.ArrowUpDown size={10} /></button>
-          <button onClick={() => updateNodeData(id, { letterSpacing: 0, lineHeight: 1.1 })} className={cn('p-1 rounded transition-colors', theme === 'dark' ? 'hover:bg-white/10 text-white/40' : 'hover:bg-slate-200 text-slate-400')} title="Reset"><LucideIcons.RefreshCw size={10} /></button>
+          <button onClick={() => updateNodeData(id, { letterSpacing: Math.min(10, (data.letterSpacing || 0) + 0.5) })} title="Letter Spacing +"
+            className={cn('p-1.5 rounded transition-colors text-[12px] font-bold', theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-200 text-slate-600')}>A↔</button>
+          <button onClick={() => updateNodeData(id, { lineHeight: Math.min(3, (data.lineHeight || 1.1) + 0.1) })} title="Line Height +"
+            className={cn('p-1.5 rounded transition-colors text-[12px] font-bold', theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-200 text-slate-600')}>↕</button>
+          <button onClick={() => updateNodeData(id, { letterSpacing: 0, lineHeight: 1.1 })} title="Reset spacing"
+            className={cn('p-1.5 rounded transition-colors', theme === 'dark' ? 'hover:bg-white/10 text-white/40' : 'hover:bg-slate-200 text-slate-400')}>
+            <LucideIcons.RefreshCw size={12} />
+          </button>
         </div>
       </div>
     </div>

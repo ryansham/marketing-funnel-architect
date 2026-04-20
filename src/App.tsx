@@ -1,4 +1,55 @@
 /* Copyright@ryansham.martechtalks_ryansham.com */
+// ─── i18n ─────────────────────────────────────────────────────────────────────
+const langDict = {
+  en: {
+    appName: 'Marketing Funnel Architect',
+    discoveryChannels: 'Discovery Channels', landingPage: 'Landing Page',
+    toolsVisuals: 'Tools & Visuals', marketingPresets: 'Marketing Presets',
+    history: 'History', savePreset: '+ Save current as preset',
+    socialFlow: 'Social Flow', autoArrange: 'Auto Arrange',
+    fitView: 'Fit View', importJSON: 'Import JSON', exportLabel: 'Export',
+    confirmReplace: 'This will replace your current canvas. Continue?',
+    searchPlaceholder: 'Search nodes... (Esc to close)',
+    benchmarkLabel: 'Industry Benchmark',
+  },
+  'zh-hk': {
+    appName: 'Marketing Funnel Architect',
+    discoveryChannels: '探索頻道', landingPage: '著陸頁',
+    toolsVisuals: '工具與視覺', marketingPresets: '行銷模板',
+    history: '歷史記錄', savePreset: '+ 儲存為模板',
+    socialFlow: '社交流程', autoArrange: '自動排列',
+    fitView: '全圖顯示', importJSON: '匯入 JSON', exportLabel: '匯出',
+    confirmReplace: '此操作將取代目前畫布，確定繼續？',
+    searchPlaceholder: '搜尋節點… (Esc 關閉)',
+    benchmarkLabel: '業界基準',
+  },
+  'zh-cn': {
+    appName: 'Marketing Funnel Architect',
+    discoveryChannels: '探索渠道', landingPage: '落地页',
+    toolsVisuals: '工具与视觉', marketingPresets: '营销模板',
+    history: '历史记录', savePreset: '+ 保存为模板',
+    socialFlow: '社交流程', autoArrange: '自动排列',
+    fitView: '全图显示', importJSON: '导入 JSON', exportLabel: '导出',
+    confirmReplace: '此操作将替换当前画布，确定继续？',
+    searchPlaceholder: '搜索节点… (Esc 关闭)',
+    benchmarkLabel: '行业基准',
+  },
+} as const;
+
+// ─── Channel Benchmarks ────────────────────────────────────────────────────────
+const CHANNEL_BENCHMARKS: Record<string, { ctr: number; cpc: number; cvr: number }> = {
+  'facebook':    { ctr: 0.9,  cpc: 0.97, cvr: 9.2  },
+  'instagram':   { ctr: 0.8,  cpc: 1.20, cvr: 7.0  },
+  'google-ads':  { ctr: 3.17, cpc: 2.32, cvr: 4.4  },
+  'youtube':     { ctr: 0.5,  cpc: 0.49, cvr: 3.0  },
+  'whatsapp':    { ctr: 28.0, cpc: 0.05, cvr: 45.0 },
+  'tiktok':      { ctr: 1.0,  cpc: 0.50, cvr: 5.0  },
+  'email':       { ctr: 2.6,  cpc: 0.10, cvr: 15.0 },
+  'form':        { ctr: 100,  cpc: 0.0,  cvr: 20.0 },
+  'wechat':      { ctr: 5.0,  cpc: 0.30, cvr: 12.0 },
+  'outdoor':     { ctr: 0.3,  cpc: 5.00, cvr: 1.5  },
+};
+
 import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import ReactFlow, { 
   Background, 
@@ -117,7 +168,15 @@ export default function App() {
 
   const [spawnOffset, setSpawnOffset] = React.useState(0);
   const [showMiniMap, setShowMiniMap] = React.useState(false);
+  const [lang, setLang] = React.useState<'en'|'zh-hk'|'zh-cn'>(() => (localStorage.getItem('fa_lang') as any) || 'en');
+  const t = React.useMemo(() => langDict[lang], [lang]);
+  const setLanguage = (l: 'en'|'zh-hk'|'zh-cn') => { setLang(l); localStorage.setItem('fa_lang', l); };
   const [leftCollapsed, setLeftCollapsed] = React.useState<Record<string,boolean>>({});
+  const [showSearch, setShowSearch] = React.useState(false);
+  const [searchQuery, setSearchQuery] = React.useState('');
+  const [showTour, setShowTour] = React.useState(() => !localStorage.getItem('fa_tour_done'));
+  const [tourStep, setTourStep] = React.useState(0);
+  const [showTemplates, setShowTemplates] = React.useState(false);
   const [rightCollapsed, setRightCollapsed] = React.useState<Record<string,boolean>>({});
 
   // Set document title
@@ -139,7 +198,13 @@ export default function App() {
         console.error('Failed to load auto-save', err);
       }
     }
-    createDefaultSequence();
+    // First time: show template chooser instead of auto-creating default
+    const isFirstTime = !localStorage.getItem('fa_tour_done');
+    if (isFirstTime) {
+      setShowTemplates(true);
+    } else {
+      createDefaultSequence();
+    }
   }, []);
 
   // Auto-save to LocalStorage every 15 seconds
@@ -239,6 +304,10 @@ export default function App() {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault();
         handleExportJSON();
+      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowSearch(v => !v);
       }
     };
 
@@ -345,7 +414,8 @@ export default function App() {
 
   const onPaneClick = useCallback(() => {
     setSelectedNode(null);
-  }, [setSelectedNode]);
+    setMenu(null);  // always close context menu when clicking canvas
+  }, [setSelectedNode, setMenu]);
 
   const onNodeContextMenu = useCallback(
     (event: React.MouseEvent, node: any) => {
@@ -561,7 +631,7 @@ export default function App() {
   // Confirm before replacing canvas
   const confirmReplace = (action: () => void) => {
     const { nodes } = useStore.getState();
-    if (nodes.length > 0 && !window.confirm('This will replace your current canvas. Continue?')) return;
+    if (nodes.length > 0 && !window.confirm(t.confirmReplace)) return;
     action();
   };
 
@@ -608,6 +678,14 @@ export default function App() {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Language Switcher */}
+          <div className={cn("flex rounded-lg border overflow-hidden text-[9px] font-black", theme === 'dark' ? "bg-white/5 border-border" : "bg-white border-slate-200 shadow-sm")}>
+            {(['en','zh-hk','zh-cn'] as const).map(l => (
+              <button key={l} onClick={() => setLanguage(l)} className={cn("px-2 py-1.5 transition-all uppercase tracking-wider", lang === l ? "bg-accent text-bg" : theme === 'dark' ? "text-white/50 hover:text-white hover:bg-white/10" : "text-slate-400 hover:text-slate-700 hover:bg-slate-50")}>
+                {l === 'en' ? 'EN' : l === 'zh-hk' ? '繁' : '简'}
+              </button>
+            ))}
+          </div>
           <div className={cn(
             "flex rounded-lg border overflow-hidden",
             theme === 'dark' ? "bg-white/5 border-border" : "bg-white border-slate-200 shadow-sm"
@@ -644,7 +722,7 @@ export default function App() {
       )}>
         <section>
           <button onClick={() => toggleSection('left','discovery')} className="w-full flex items-center justify-between text-[10px] uppercase tracking-widest text-text-dim font-black mb-4 opacity-50 hover:opacity-100 transition-opacity">
-            <span>Discovery Channels</span>
+            <span>{t.discoveryChannels}</span>
             <LucideIcons.ChevronDown size={12} className={cn("transition-transform", leftCollapsed['discovery'] && "rotate-180")} />
           </button>
           {!leftCollapsed['discovery'] && <>
@@ -787,6 +865,13 @@ export default function App() {
           {!leftCollapsed['presets'] && <>
           <div className="space-y-2">
             <ToolkitItem 
+              icon={LucideIcons.LayoutTemplate}
+              label="Browse Templates"
+              color="bg-accent"
+              onClick={() => setShowTemplates(true)}
+              theme={theme}
+            />
+            <ToolkitItem 
               icon={Layers} 
               label="Social Flow" 
               color="bg-accent" 
@@ -901,29 +986,170 @@ export default function App() {
                 <button onClick={() => arrangeGrid('grid')} className="p-2 rounded-lg transition-all text-text-dim hover:bg-black/5" title="Auto Arrange"><LucideIcons.LayoutGrid size={16} /></button>
                 {/* Toggle Metrics */}
                 <button onClick={toggleNumbers} className="p-2 rounded-lg transition-all text-text-dim hover:bg-black/5" title={showNumbers ? "Hide Metrics" : "Show Metrics"}>{showNumbers ? <LucideIcons.Eye size={16} /> : <LucideIcons.EyeOff size={16} />}</button>
+                {/* Cmd+K Search */}
+                <button onClick={() => setShowSearch(v => !v)} className={cn("p-2 rounded-lg transition-all", showSearch ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Search nodes (⌘K)"><LucideIcons.Search size={16} /></button>
                 {/* MiniMap toggle */}
                 <button onClick={() => setShowMiniMap(v => !v)} className={cn("p-2 rounded-lg transition-all", showMiniMap ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Toggle MiniMap"><LucideIcons.Map size={16} /></button>
              </div>
           </Panel>
 
-          {showGroupPanel && (
-            <Panel position="top-center" className="animate-in fade-in slide-in-from-top-4">
-              <div className={cn(
-                "flex items-center gap-2 p-2 rounded-xl shadow-2xl border",
-                theme === 'dark' ? "bg-slate-900 border-white/10" : "bg-white border-slate-200"
-              )}>
-                 <span className="text-[10px] font-black uppercase px-2 text-text-dim">Selection: {selectedNodes.length}</span>
-                 <button 
-                  onClick={() => createGroup(selectedNodes.map(n => n.id))}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-accent text-bg rounded-lg text-[10px] font-bold hover:scale-105 transition-transform"
-                 >
-                    <Layers size={14} /> Group Selection
-                 </button>
-              </div>
-            </Panel>
-          )}
+
           
 
+
+          {/* Cmd+K Search Overlay */}
+          {showSearch && (
+            <div className="fixed inset-0 z-[2000] flex items-start justify-center pt-[20vh]" onClick={() => setShowSearch(false)}>
+              <div className={cn("w-[480px] rounded-2xl shadow-2xl border overflow-hidden", theme === 'dark' ? "bg-slate-900 border-white/10" : "bg-white border-slate-200")} onClick={e => e.stopPropagation()}>
+                <div className="flex items-center gap-3 px-4 py-3 border-b border-border">
+                  <LucideIcons.Search size={16} className="text-text-dim" />
+                  <input
+                    autoFocus
+                    className="flex-1 bg-transparent outline-none text-sm font-medium placeholder:text-text-dim"
+                    placeholder={t.searchPlaceholder}
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    onKeyDown={e => { if (e.key === 'Escape') { setShowSearch(false); setSearchQuery(''); } }}
+                  />
+                  <kbd className={cn("text-[9px] px-1.5 py-0.5 rounded font-mono", theme === 'dark' ? "bg-white/10 text-white/40" : "bg-slate-100 text-slate-400")}>ESC</kbd>
+                </div>
+                <div className="max-h-64 overflow-y-auto p-2">
+                  {nodes
+                    .filter(n => n.data?.label?.toLowerCase().includes(searchQuery.toLowerCase()) && searchQuery.length > 0)
+                    .slice(0, 8)
+                    .map(n => (
+                      <button key={n.id} className={cn("w-full text-left px-3 py-2 rounded-lg text-sm flex items-center gap-3 transition-all", theme === 'dark' ? "hover:bg-white/10 text-white" : "hover:bg-slate-50 text-slate-800")}
+                        onClick={() => {
+                          useStore.getState().setSelectedNode(n.id);
+                          setShowSearch(false); setSearchQuery('');
+                          // fly to node
+                          setTimeout(() => document.querySelector('.react-flow__controls-fitview')?.dispatchEvent(new MouseEvent('click',{bubbles:true})), 50);
+                        }}
+                      >
+                        <LucideIcons.Layers size={14} className="text-accent shrink-0" />
+                        <div>
+                          <div className="font-bold text-xs">{n.data?.label}</div>
+                          <div className="text-[10px] opacity-50 capitalize">{n.type}</div>
+                        </div>
+                      </button>
+                    ))
+                  }
+                  {searchQuery.length === 0 && (
+                    <div className="px-3 py-4 text-center text-[11px] text-text-dim opacity-50">
+                      Start typing to find a node on the canvas
+                    </div>
+                  )}
+                  {searchQuery.length > 0 && nodes.filter(n => n.data?.label?.toLowerCase().includes(searchQuery.toLowerCase())).length === 0 && (
+                    <div className="px-3 py-4 text-center text-[11px] text-text-dim opacity-50">No nodes found</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ── Guided Tour ─────────────────────────────────────────────── */}
+          {showTour && (() => {
+            const STEPS = [
+              { icon: '🃏', title: 'Drag cards onto the canvas', body: 'Pick any channel from the left panel (Ads, Email, Social…) and drag it onto the canvas.' },
+              { icon: '🔗', title: 'Connect cards', body: 'Hover a card to reveal its blue handles, then drag from a handle to another card to create a connection.' },
+              { icon: '⚙️', title: 'Configure each step', body: 'Click any card to open its settings on the right — set volume, CTR, notes and more.' },
+              { icon: '📤', title: 'Export your funnel', body: 'Use the Export button (top-right) to download as PNG, PDF or share as JSON.' },
+            ];
+            const step = STEPS[tourStep];
+            return (
+              <div className="fixed inset-0 z-[3000] flex items-end justify-center pb-10 pointer-events-none">
+                <div className={cn("pointer-events-auto w-[380px] rounded-2xl shadow-2xl border p-5 animate-in slide-in-from-bottom-4", theme === 'dark' ? "bg-slate-900 border-white/10" : "bg-white border-slate-200")}>
+                  <div className="flex items-start gap-4">
+                    <div className="text-3xl">{step.icon}</div>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between mb-1">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-text-dim opacity-50">{tourStep+1} / {STEPS.length}</span>
+                        <button onClick={() => { setShowTour(false); localStorage.setItem('fa_tour_done','1'); }} className="text-[9px] text-text-dim hover:text-accent transition-colors">Skip tour</button>
+                      </div>
+                      <div className="font-black text-sm mb-1">{step.title}</div>
+                      <div className="text-[11px] text-text-dim leading-relaxed">{step.body}</div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 mt-4">
+                    <div className="flex gap-1 flex-1">
+                      {STEPS.map((_, i) => <div key={i} className={cn("h-1 rounded-full flex-1 transition-all", i === tourStep ? "bg-accent" : "bg-border")} />)}
+                    </div>
+                    {tourStep < STEPS.length - 1
+                      ? <button onClick={() => setTourStep(s => s+1)} className="px-4 py-1.5 bg-accent text-bg rounded-lg text-[10px] font-black uppercase hover:scale-105 transition-transform">Next</button>
+                      : <button onClick={() => { setShowTour(false); localStorage.setItem('fa_tour_done','1'); }} className="px-4 py-1.5 bg-accent text-bg rounded-lg text-[10px] font-black uppercase hover:scale-105 transition-transform">Done!</button>
+                    }
+                  </div>
+                </div>
+              </div>
+            );
+          })()}
+
+          {/* ── Template chooser ─────────────────────────────────────────────── */}
+          {showTemplates && (
+            <div className="fixed inset-0 z-[2500] flex items-center justify-center" onClick={() => setShowTemplates(false)}>
+              <div className={cn("w-[600px] rounded-2xl shadow-2xl border p-6 animate-in zoom-in-95", theme === 'dark' ? "bg-slate-900 border-white/10" : "bg-white border-slate-200")} onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between mb-5">
+                  <div>
+                    <div className="font-black text-base">Choose a Template</div>
+                    <div className="text-[11px] text-text-dim mt-0.5">Start with a pre-built campaign flow</div>
+                  </div>
+                  <button onClick={() => setShowTemplates(false)} className="p-2 rounded-lg hover:bg-black/5 text-text-dim"><LucideIcons.X size={16} /></button>
+                </div>
+                <div className="grid grid-cols-3 gap-3">
+                  {[
+                    { key:'o2o', emoji:'🏪', title:'O2O Event', desc:'Drive online traffic to an offline event or pop-up', color:'bg-blue-50 border-blue-200' },
+                    { key:'leadgen', emoji:'🎯', title:'Lead Gen', desc:'Capture leads via ads → form → CRM nurture', color:'bg-purple-50 border-purple-200' },
+                    { key:'loyalty', emoji:'⭐', title:'Loyalty Program', desc:'Re-engage existing customers via WhatsApp & email', color:'bg-green-50 border-green-200' },
+                  ].map(tpl => (
+                    <button key={tpl.key} onClick={() => {
+                      setShowTemplates(false);
+                      const t2 = Date.now();
+                      if (tpl.key === 'leadgen') {
+                        const ga = 'lg-ga-'+t2, meta = 'lg-meta-'+t2, lp = 'lg-lp-'+t2, form = 'lg-form-'+t2, email = 'lg-email-'+t2;
+                        setNodes([
+                          {id:ga,type:'marketing',position:{x:80,y:200},data:{label:'Google Ads',type:'discovery',primaryChannel:'google-ads',volume:20000,ctr:3.2,cpc:1.5,note:'Search + Display campaign targeting high-intent keywords.'}},
+                          {id:meta,type:'marketing',position:{x:80,y:400},data:{label:'Meta Ads',type:'discovery',primaryChannel:'facebook',volume:18000,ctr:1.8,cpc:0.8,note:'Retargeting warm audiences and lookalike campaigns.'}},
+                          {id:lp,type:'landing',position:{x:420,y:200},data:{label:'Lead Capture Page',type:'owned',pageType:'Static Page',mockupModules:[{id:'m1',type:'Hero',label:'Hero'},{id:'m2',type:'Form',label:'Lead Form'}]}},
+                          {id:form,type:'marketing',position:{x:750,y:200},data:{label:'CRM Entry',type:'discovery',primaryChannel:'form',volume:0,ctr:0,cpc:0,note:'Lead data synced to CRM. Start 7-day nurture sequence.'}},
+                          {id:email,type:'marketing',position:{x:1060,y:200},data:{label:'Nurture Email',type:'discovery',primaryChannel:'email',volume:0,ctr:0,cpc:0,note:'Day 1: Welcome. Day 3: Case study. Day 7: Offer.'}},
+                        ]);
+                        setEdges([
+                          {id:'e1',source:ga,target:lp,sourceHandle:'right',targetHandle:'left',type:'custom'},
+                          {id:'e2',source:meta,target:lp,sourceHandle:'right',targetHandle:'left',type:'custom'},
+                          {id:'e3',source:lp,target:form,sourceHandle:'right',targetHandle:'left',type:'custom'},
+                          {id:'e4',source:form,target:email,sourceHandle:'right',targetHandle:'left',type:'custom'},
+                        ]);
+                      } else if (tpl.key === 'loyalty') {
+                        const wa = 'ly-wa-'+t2, email2 = 'ly-email-'+t2, lp2 = 'ly-lp-'+t2, qr = 'ly-qr-'+t2;
+                        setNodes([
+                          {id:wa,type:'marketing',position:{x:80,y:200},data:{label:'WhatsApp Blast',type:'discovery',primaryChannel:'whatsapp',volume:5000,ctr:28,cpc:0.05,note:'Personalized message to existing members with exclusive offer.'}},
+                          {id:email2,type:'marketing',position:{x:80,y:400},data:{label:'Re-engage Email',type:'discovery',primaryChannel:'email',volume:8000,ctr:2.6,cpc:0.1,note:'Segment by last purchase date. A/B test subject lines.'}},
+                          {id:lp2,type:'landing',position:{x:420,y:250},data:{label:'Member Rewards Page',type:'owned',pageType:'Static Page',mockupModules:[{id:'m1',type:'Hero',label:'Hero'},{id:'m2',type:'Redemption',label:'Redeem'},{id:'m3',type:'QR',label:'QR Code'}]}},
+                          {id:qr,type:'marketing',position:{x:760,y:250},data:{label:'Offline Redemption',type:'discovery',primaryChannel:'outdoor',volume:0,ctr:0,cpc:0,note:'Staff scans QR at POS. Reward credited instantly to CRM.'}},
+                        ]);
+                        setEdges([
+                          {id:'e1',source:wa,target:lp2,sourceHandle:'right',targetHandle:'left',type:'custom'},
+                          {id:'e2',source:email2,target:lp2,sourceHandle:'right',targetHandle:'left',type:'custom'},
+                          {id:'e3',source:lp2,target:qr,sourceHandle:'right',targetHandle:'left',type:'custom'},
+                        ]);
+                      } else {
+                        createDefaultSequence();
+                      }
+                    }} className={cn("flex flex-col items-start gap-2 p-4 rounded-xl border text-left transition-all hover:scale-[1.02] hover:shadow-lg", theme === 'dark' ? "bg-white/5 border-white/10 hover:border-accent/50" : tpl.color)}>
+                      <div className="text-2xl">{tpl.emoji}</div>
+                      <div className="font-black text-sm">{tpl.title}</div>
+                      <div className="text-[11px] text-text-dim leading-relaxed">{tpl.desc}</div>
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-4 pt-4 border-t border-border">
+                  <button onClick={() => { setShowTemplates(false); }} className="text-[11px] text-text-dim hover:text-accent transition-colors">
+                    → Start with blank canvas instead
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
 
           <ShortcutsHelper theme={theme} />
           {menu && <ContextMenu 
@@ -1136,6 +1362,18 @@ function StatGroup({ label, value, theme }: { label: string; value: string; them
 
 function Footer({ theme }: { theme: 'dark' | 'light' }) {
   const { nodes, showNumbers } = useStore();
+  const { edges: allEdges } = useStore();
+  // Funnel drop-off: for each edge, compute conversion from source CTR
+  const funnelSteps = React.useMemo(() => {
+    return allEdges.map(e => {
+      const src = nodes.find(n => n.id === e.source);
+      if (!src || !src.data?.volume || !src.data?.ctr) return null;
+      const reach = src.data.volume;
+      const clicks = Math.round(reach * (src.data.ctr / 100));
+      const dropOff = reach - clicks;
+      return { label: src.data.label || '?', reach, clicks, dropOff, dropPct: ((dropOff / reach) * 100).toFixed(0) };
+    }).filter(Boolean);
+  }, [nodes, allEdges]);
   const totalConversions = nodes.reduce((acc, node) => {
     if (node.data?.type === 'physical') {
       const dropoff = 1 - ((node.data?.physicalDropoff || 20) / 100);
@@ -1333,8 +1571,8 @@ function ContextMenu({
           <>
              <div className="px-3 py-1.5 text-[8px] font-black uppercase tracking-widest text-text-dim opacity-50">Canvas Actions</div>
              <ContextMenuItem icon={LucideIcons.Clipboard} label="Paste" onClick={() => handleAction(pasteSelection)} theme={theme} />
-             <ContextMenuItem icon={LucideIcons.LayoutGrid} label="Auto-Arrange (Grid)" onClick={() => handleAction(() => useStore.getState().arrangeGrid('grid'))} theme={theme} />
-             <ContextMenuItem icon={LucideIcons.Maximize} label="Fit View" onClick={() => handleAction(() => {})} theme={theme} />
+             <ContextMenuItem icon={LucideIcons.LayoutGrid} label="Auto-Arrange" onClick={() => handleAction(() => useStore.getState().arrangeGrid('grid'))} theme={theme} />
+             <ContextMenuItem icon={LucideIcons.Maximize} label="Fit View" onClick={() => { onClick(); document.querySelector('.react-flow__controls-fitview')?.dispatchEvent(new MouseEvent('click', { bubbles: true })); }} theme={theme} />
           </>
         )}
       </div>

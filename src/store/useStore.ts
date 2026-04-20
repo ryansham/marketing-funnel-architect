@@ -321,60 +321,57 @@ export const useStore = create<AppState>((set, get) => ({
 
     const positions = new Map<string, { x: number, y: number }>();
 
-    // Linear layout: follow edge connections left-to-right, vertically centered
-    const colGap = 300;  // horizontal gap between cards
-    const centerY = 400; // vertical center for all cards
-    const startX = 120;
-    const branchGap = 200; // vertical gap for branching nodes
+    // Linear layout: BFS left→right, then vertically center each column
+    const colGap    = 320;   // horizontal gap between columns
+    const rowGap    = 200;   // vertical gap between rows within a column
+    const startX    = 100;
 
     const incomingCount = new Map<string, number>();
     edges.forEach(e => incomingCount.set(e.target, (incomingCount.get(e.target) || 0) + 1));
 
-    const processed = new Set<string>();
-    let col = 0;
-
-    // BFS traversal from roots, keeping linear order
-    const queue: Array<{ id: string; col: number; row: number }> = [];
     const roots = cards.filter(n => !incomingCount.has(n.id));
-
-    // If no roots (circular), just take first card
     if (roots.length === 0 && cards.length > 0) roots.push(cards[0]);
 
-    roots.forEach((root, i) => queue.push({ id: root.id, col: 0, row: i }));
-
-    let maxCol = 0;
-    const rowAtCol = new Map<number, number>(); // track rows used at each col
+    // BFS: assign each card a column and a slot within that column
+    const colItems = new Map<number, string[]>(); // col → [nodeId, ...]
+    const nodeCol  = new Map<string, number>();
+    const processed = new Set<string>();
+    const queue: Array<{ id: string; col: number }> = roots.map(r => ({ id: r.id, col: 0 }));
 
     while (queue.length > 0) {
-      const { id, col, row } = queue.shift()!;
+      const { id, col } = queue.shift()!;
       if (processed.has(id)) continue;
       processed.add(id);
+      nodeCol.set(id, col);
+      if (!colItems.has(col)) colItems.set(col, []);
+      colItems.get(col)!.push(id);
 
-      const usedRow = rowAtCol.get(col) || 0;
-      const actualRow = Math.max(row, usedRow);
-      rowAtCol.set(col, actualRow + 1);
-
-      positions.set(id, {
-        x: startX + col * colGap,
-        y: centerY + actualRow * branchGap - (roots.length - 1) * branchGap / 2
-      });
-      maxCol = Math.max(maxCol, col);
-
-      const children = edges
+      edges
         .filter(e => e.source === id)
         .map(e => e.target)
-        .filter(tid => cards.some(n => n.id === tid) && !processed.has(tid));
-
-      children.forEach((childId, i) => queue.push({ id: childId, col: col + 1, row: actualRow + i }));
+        .filter(tid => cards.some(n => n.id === tid) && !processed.has(tid))
+        .forEach(childId => queue.push({ id: childId, col: col + 1 }));
     }
 
-    // Any unconnected cards go in a row below
-    let extraRow = 1;
+    // Any unprocessed (disconnected) cards
+    let extraCol = (colItems.size > 0 ? Math.max(...colItems.keys()) + 1 : 0);
     cards.forEach(n => {
       if (!processed.has(n.id)) {
-        positions.set(n.id, { x: startX + (maxCol + 1) * colGap, y: centerY + extraRow * branchGap });
-        extraRow++;
+        if (!colItems.has(extraCol)) colItems.set(extraCol, []);
+        colItems.get(extraCol)!.push(n.id);
       }
+    });
+
+    // Now position: center each column's items around a common horizontal center line
+    colItems.forEach((ids, col) => {
+      const totalH = (ids.length - 1) * rowGap;   // total span
+      const topY   = -totalH / 2;                  // start so items center on y=0
+      ids.forEach((id, i) => {
+        positions.set(id, {
+          x: startX + col * colGap,
+          y: 400 + topY + i * rowGap,
+        });
+      });
     });
 
     const arrangedCards = cards.map(node => ({
