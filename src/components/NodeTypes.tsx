@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from 'react';
-import { Handle, Position, NodeResizer, BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
+import { Handle, Position, BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '../lib/utils';
 import { NodeType, MockupModule } from '../types';
@@ -391,8 +391,6 @@ export const LandingPageNode = memo(({ id, data, selected }: any) => {
         </div>
       )}
 
-      <NodeResizer isVisible={selected} onResize={(_, { width, height }) => updateNodeData(id, { width, height })} minWidth={150} minHeight={250} />
-
       <div className={cn('absolute top-1.5 left-1/2 -translate-x-1/2 w-8 h-1 rounded-full z-20', theme === 'dark' ? 'bg-white/20' : 'bg-black/10')} />
 
       <div className={cn('flex-1 w-full rounded-[24px] overflow-hidden flex flex-col relative border shadow-inner', theme === 'dark' ? 'bg-black border-white/5' : 'bg-white border-slate-200')}>
@@ -434,7 +432,6 @@ export const StickyNoteNode = memo(({ id, data, selected }: any) => {
       style={{ width: data.width || 220, height: data.height || 180 }}
     >
       <NodeHandles visible={selected || isConnecting} color="#eab308" />
-      <NodeResizer minWidth={100} minHeight={100} isVisible={selected} lineClassName="border-yellow-400" handleClassName="h-2 w-2 bg-white border border-yellow-400 rounded-sm" onResize={(_, { width, height }) => updateNodeData(id, { width, height })} />
 
       <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-bl from-yellow-300 to-transparent pointer-events-none opacity-30" />
 
@@ -501,7 +498,6 @@ export const ImageNode = memo(({ id, data, selected }: any) => {
   return (
     <div className={cn('p-1 border rounded-xl overflow-hidden shadow-xl transition-all relative group', theme === 'dark' ? 'bg-slate-800 border-white/10' : 'bg-white border-slate-200', selected ? 'ring-2 ring-accent' : 'hover:shadow-2xl hover:scale-[1.01]')} style={{ width: data.width || 200, height: data.height || 200 }}>
       <NodeHandles visible={selected || isConnecting} color="#38bdf8" />
-      <NodeResizer isVisible={selected} onResize={(_, { width, height }) => updateNodeData(id, { width, height })} />
       {data.imageUrl ? (
         <img src={data.imageUrl} alt="Node" className="w-full h-full object-contain" referrerPolicy="no-referrer" />
       ) : (
@@ -530,7 +526,6 @@ export const FreeTextNode = memo(({ id, data, selected }: any) => {
   return (
     <div className={cn('p-2 transition-all group relative', selected ? 'ring-1 ring-accent/30' : '')} style={{ width: data.width || 220, height: data.height || 100, minWidth: 100 }}>
       <NodeHandles visible={selected || isConnecting} color="#38bdf8" />
-      <NodeResizer minWidth={100} isVisible={selected} onResize={(_, { width, height }) => updateNodeData(id, { width, height })} />
       <textarea
         className={cn(
           "flex-1 w-full h-full bg-transparent border-none outline-none resize-none text-[13px] leading-relaxed p-2 placeholder:opacity-40",
@@ -605,7 +600,6 @@ export const ShapeNode = memo(({ id, data, selected }: any) => {
       )}
 
       {selected && (
-        <NodeResizer isVisible={selected} onResize={(_, { width, height }) => updateNodeData(id, { width, height })} handleClassName={cn('h-1.5 w-1.5 !bg-accent !border-none !rounded-none', (type === 'line' || type === 'dotted-line') ? '!h-3 !w-1' : '')} />
       )}
 
       {type === 'line' || type === 'dotted-line' ? (
