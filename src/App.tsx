@@ -307,6 +307,8 @@ export default function App() {
   };
 
   const onNodeClick = useCallback((event: React.MouseEvent, node: any) => {
+    // Don't select group nodes directly — let clicks pass through to children
+    if (node.type === 'group') return;
     setSelectedNode(node.id);
   }, [setSelectedNode]);
 
@@ -389,24 +391,24 @@ export default function App() {
     const landingId = 'preset-lp-' + timestamp;
     const formId = 'preset-form-' + timestamp;
     const emailId = 'preset-email-' + timestamp;
-    const groupId = 'group-preset-' + timestamp;
-
-    const basePos = { x: 100, y: 100 };
-
-    const groupNode = {
-      id: groupId,
-      type: 'group',
-      position: basePos,
-      style: { width: 1250, height: 420, pointerEvents: 'none' as unknown as undefined },
-      data: { label: 'Social Acquisition Flow', type: 'group' }
-    };
+    const bgId = 'bg-preset-' + timestamp;
 
     const newNodes: any[] = [
-      groupNode,
-      { id: fbId, parentId: groupId, extent: 'parent', type: 'marketing', position: { x: 40, y: 160 }, data: { label: 'Facebook Ads', type: 'discovery', primaryChannel: 'facebook', volume: 10000, ctr: 3, cpc: 0.5 } },
-      { id: landingId, parentId: groupId, extent: 'parent', type: 'landing', position: { x: 340, y: 50 }, data: { label: 'Campaign Page', type: 'owned', pageType: 'Static Page', mockupModules: [{ id: 'm1', type: 'Hero', content: {} }, { id: 'm2', type: 'CTA', content: {} }, { id: 'm3', type: 'Subscription', content: {} }] } },
-      { id: formId, parentId: groupId, extent: 'parent', type: 'marketing', position: { x: 650, y: 160 }, data: { label: 'Registration Form', type: 'discovery', primaryChannel: 'form', volume: 0, ctr: 0, cpc: 0 } },
-      { id: emailId, parentId: groupId, extent: 'parent', type: 'marketing', position: { x: 950, y: 160 }, data: { label: 'Email Confirmation', type: 'discovery', primaryChannel: 'email', volume: 0, ctr: 0, cpc: 0 } },
+      // Background shape — acts as a visual group container without blocking clicks
+      { id: bgId, type: 'shape', position: { x: 80, y: 80 },
+        style: { width: 1320, height: 440, zIndex: -1 },
+        data: { label: 'Social Acquisition Flow', type: 'shape', shapeType: 'square',
+          fillColor: 'rgba(56,189,248,0.04)', strokeColor: '#38bdf8', strokeWidth: 1.5,
+          volume: 0, ctr: 0, cpc: 0 } },
+      { id: fbId, type: 'marketing', position: { x: 140, y: 250 },
+        data: { label: 'Facebook Ads', type: 'discovery', primaryChannel: 'facebook', volume: 10000, ctr: 3, cpc: 0.5 } },
+      { id: landingId, type: 'landing', position: { x: 420, y: 120 },
+        data: { label: 'Campaign Page', type: 'owned', pageType: 'Static Page',
+          mockupModules: [{ id: 'm1', type: 'Hero', content: {} }, { id: 'm2', type: 'CTA', content: {} }, { id: 'm3', type: 'Subscription', content: {} }] } },
+      { id: formId, type: 'marketing', position: { x: 740, y: 250 },
+        data: { label: 'Registration Form', type: 'discovery', primaryChannel: 'form', volume: 0, ctr: 0, cpc: 0 } },
+      { id: emailId, type: 'marketing', position: { x: 1060, y: 250 },
+        data: { label: 'Email Confirmation', type: 'discovery', primaryChannel: 'email', volume: 0, ctr: 0, cpc: 0 } },
     ];
 
     const newEdges = [
@@ -417,6 +419,8 @@ export default function App() {
 
     setNodes(newNodes);
     setEdges(newEdges);
+    // Push bg shape to back so cards render on top and are clickable
+    setTimeout(() => useStore.getState().sendToBack(bgId), 50);
   };
 
   const handleExportJSON = () => {
