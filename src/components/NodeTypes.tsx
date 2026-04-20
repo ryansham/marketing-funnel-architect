@@ -148,14 +148,15 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
   const Icon           = (LucideIcons as any)[customIconName] || LucideIcons.HelpCircle;
   const accentColor    = data.strokeColor || (channelData ? channelData.color : config.accent);
   // Use subtle brand tint for channel cards, or explicit fillColor, or default
-  const defaultBg = theme === 'dark' ? 'rgb(30, 41, 59)' : 'rgb(255, 255, 255)';
-  const brandTint = channelData ? `${channelData.color}12` : null; // 12 = ~7% opacity hex
-  const bgColor   = data.fillColor || (isDiscovery && brandTint ? brandTint : defaultBg);
-
+  // IMPORTANT: isDiscovery must be declared before bgColor (Vite TDZ bug if reversed)
   const isDiscovery = data.type === 'discovery';
   const isAds       = data.primaryChannel === 'google-ads' ||
                       (data.primaryChannel === 'others' && data.label?.toLowerCase().includes('ads'));
   const hasBrand    = !!channelData?.brandLogo;
+
+  const defaultBg = theme === 'dark' ? 'rgb(30, 41, 59)' : 'rgb(255, 255, 255)';
+  const brandTint = channelData ? `${channelData.color}12` : null;
+  const bgColor   = data.fillColor || (isDiscovery && brandTint ? brandTint : defaultBg);
 
   const activeShadow    = `0 8px 32px -4px ${accentColor}40, 0 0 0 2px ${accentColor}30`;
   const highlightShadow = `0 0 0 2px ${accentColor}80, 0 8px 24px -4px ${accentColor}30`;
