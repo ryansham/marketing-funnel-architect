@@ -20,7 +20,6 @@ export const useStore = create<AppState>((set, get) => ({
   selectedNodeId: null,
   history: [],
   historyIndex: -1,
-  showNumbers: false,
   theme: 'light',
   interactionMode: 'select',
   isConnecting: false,
@@ -297,7 +296,6 @@ export const useStore = create<AppState>((set, get) => ({
     set({ nodes: updatedNodes });
   },
 
-  toggleNumbers: () => set({ showNumbers: !get().showNumbers }),
   setTheme: (theme: 'dark' | 'light') => set({ theme }),
 
   importCampaign: (data: { nodes: any[]; edges: any[] }) => {

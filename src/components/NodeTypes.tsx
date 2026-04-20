@@ -135,7 +135,6 @@ function NodeHandles({ visible, color = '#38bdf8' }: { visible: boolean; color?:
 
 export const MarketingNode = memo(({ id, data, selected }: any) => {
   const updateNodeData = useStore((s) => s.updateNodeData);
-  const showNumbers    = useStore((s) => s.showNumbers);
   const theme          = useStore((s) => s.theme);
   const bringToFront   = useStore((s) => s.bringToFront);
   const sendToBack     = useStore((s) => s.sendToBack);
@@ -161,16 +160,6 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
   const activeShadow    = `0 8px 32px -4px ${accentColor}40, 0 0 0 2px ${accentColor}30`;
   const highlightShadow = `0 0 0 2px ${accentColor}80, 0 8px 24px -4px ${accentColor}30`;
   const defaultShadow   = `0 4px 16px -4px ${accentColor}20`;
-
-  // Benchmark data for channel tooltips
-  const BENCHMARKS: Record<string, {ctr:number;cpc:number}> = {
-    'facebook':{'ctr':0.9,'cpc':0.97},'instagram':{'ctr':0.8,'cpc':1.20},
-    'google-ads':{'ctr':3.17,'cpc':2.32},'youtube':{'ctr':0.5,'cpc':0.49},
-    'whatsapp':{'ctr':28.0,'cpc':0.05},'tiktok':{'ctr':1.0,'cpc':0.50},
-    'email':{'ctr':2.6,'cpc':0.10},'form':{'ctr':100,'cpc':0.0},
-    'wechat':{'ctr':5.0,'cpc':0.30},'outdoor':{'ctr':0.3,'cpc':5.0},
-  };
-  const bench = data.primaryChannel ? BENCHMARKS[data.primaryChannel] : null;
 
   return (
     <div
@@ -264,47 +253,21 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
           </div>
         )}
 
-        {!isDiscovery && showNumbers && (
-          <div className="flex flex-col gap-0.5">
-            <div className="text-[9px] font-black text-text-dim uppercase tracking-wider opacity-50">Reach Potential</div>
-            <div className={cn('text-sm font-bold tracking-tight', theme === 'dark' ? 'text-white' : 'text-slate-900')}>
-              {data.volume.toLocaleString()}
-            </div>
-          </div>
-        )}
-
-        {/* Discovery cards: show note below if set */}
-        {isDiscovery && data.note && (
-          <div className={cn('mt-1.5 text-[9px] leading-relaxed opacity-60 max-w-[200px] text-center whitespace-normal', theme === 'dark' ? 'text-white' : 'text-slate-700')}>
-            {data.note.length > 80 ? data.note.substring(0, 80) + '…' : data.note}
-          </div>
-        )}
-
-        {!isDiscovery && (
-          <div className="space-y-1">
-            <button
-              onClick={() => updateNodeData(id, { expanded: !data.expanded })}
-              className="w-full flex items-center justify-between px-2 py-1 bg-black/10 rounded text-[9px] font-bold text-text-dim hover:text-white transition-colors"
-            >
-              <span>{data.expanded ? 'Collapse Note' : 'Expand Note'}</span>
-              <LucideIcons.ChevronDown size={10} className={cn('transition-transform', data.expanded && 'rotate-180')} />
-            </button>
-            {data.expanded && (
-              <textarea
-                className={cn(
-                  'w-full border border-white/5 rounded p-1.5 text-[10px] outline-none focus:border-accent/40 h-16 resize-none transition-all font-medium leading-relaxed mt-1 animate-in slide-in-from-top-1',
-                  theme === 'dark' ? 'bg-black/20 text-white/80 placeholder:text-white/20' : 'bg-slate-50 text-slate-700 placeholder:text-black',
-                )}
-                placeholder="Marketing notes..."
-                autoFocus
-                value={data.note || ''}
-                onChange={(e) => updateNodeData(id, { note: e.target.value })}
-                onMouseDown={(e) => e.stopPropagation()}
-                onPointerDown={(e) => e.stopPropagation()}
-              />
-            )}
-          </div>
-        )}
+        {/* Note — always visible and editable on both discovery + non-discovery cards */}
+        <textarea
+          className={cn(
+            'w-full border rounded p-1.5 mt-1.5 text-[10px] outline-none focus:border-accent/40 resize-none transition-all font-medium leading-relaxed',
+            isDiscovery ? 'text-center' : '',
+            theme === 'dark' ? 'bg-black/20 border-white/5 text-white/80 placeholder:text-white/20 focus:bg-black/30' : 'bg-slate-50 border-slate-200 text-slate-700 placeholder:text-slate-400 focus:bg-white',
+          )}
+          style={{ minHeight: 36, height: 'auto', maxHeight: 120 }}
+          placeholder="Add a note..."
+          rows={2}
+          value={data.note || ''}
+          onChange={(e) => { updateNodeData(id, { note: e.target.value }); e.target.style.height = 'auto'; e.target.style.height = Math.min(120, e.target.scrollHeight) + 'px'; }}
+          onMouseDown={(e) => e.stopPropagation()}
+          onPointerDown={(e) => e.stopPropagation()}
+        />
       </div>
     </div>
   );
@@ -488,25 +451,35 @@ export const TitleNode = memo(({ id, data, selected }: any) => {
   const updateNodeData = useStore((s) => s.updateNodeData);
   const theme          = useStore((s) => s.theme);
   const bringToFront   = useStore((s) => s.bringToFront);
-  // No isConnecting — title nodes don't connect to anything
+  const [isResizing, setIsResizing] = React.useState(false);
+
+  const onResizeDragStart = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startW = data.width || 480;
+    const startH = data.height || 120;
+    setIsResizing(true);
+    const onMove = (ev: PointerEvent) => {
+      const newW = Math.max(200, startW + (ev.clientX - startX));
+      const newH = Math.max(60,  startH + (ev.clientY - startY));
+      updateNodeData(id, { width: newW, height: newH });
+    };
+    const onUp = () => {
+      setIsResizing(false);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  };
 
   return (
     <div
       onClick={() => bringToFront(id)}
-      className={cn('p-3 transition-all flex flex-col rounded-sm', selected ? 'ring-1 ring-accent/30' : '')}
-      style={{
-        width: data.width || 480,
-        minWidth: 240,
-        minHeight: 60,
-        resize: selected ? 'both' : 'none',
-        overflow: 'hidden',
-        cursor: 'default',
-        transformOrigin: 'top left',  // pin resize to top-left
-      }}
-      onMouseUp={(e) => {
-        const el = e.currentTarget;
-        updateNodeData(id, { width: el.offsetWidth, height: el.offsetHeight });
-      }}
+      className={cn('relative p-3 transition-all flex flex-col rounded-sm overflow-hidden', selected ? 'ring-1 ring-accent/30' : '')}
+      style={{ width: data.width || 480, minHeight: data.height || 120, cursor: 'default' }}
     >
       {/* No NodeHandles — title is standalone */}
       <textarea
@@ -526,6 +499,18 @@ export const TitleNode = memo(({ id, data, selected }: any) => {
         onPointerDown={(e) => e.stopPropagation()}
       />
       {selected && <TitleFloatingToolbar id={id} data={data} />}
+      {/* Resize handle — bottom-right corner, only when selected */}
+      {selected && (
+        <div
+          className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize flex items-end justify-end p-0.5"
+          onPointerDown={onResizeDragStart}
+          onClick={e => e.stopPropagation()}
+        >
+          <svg width="10" height="10" viewBox="0 0 10 10" className="text-accent opacity-60">
+            <path d="M9 1L1 9M9 5L5 9M9 9L9 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        </div>
+      )}
     </div>
   );
 });
@@ -572,34 +557,45 @@ export const ImageNode = memo(({ id, data, selected }: any) => {
 export const FreeTextNode = memo(({ id, data, selected }: any) => {
   const updateNodeData = useStore((s) => s.updateNodeData);
   const theme          = useStore((s) => s.theme);
-  // No isConnecting — marketing notes are standalone, no connection handles
+  const [isResizing, setIsResizing] = React.useState(false);
+
+  const onResizeDragStart = (e: React.PointerEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
+    const startX = e.clientX;
+    const startY = e.clientY;
+    const startW = data.width || 280;
+    const startH = data.height || 110;
+    setIsResizing(true);
+    const onMove = (ev: PointerEvent) => {
+      updateNodeData(id, {
+        width:  Math.max(120, startW + (ev.clientX - startX)),
+        height: Math.max(60,  startH + (ev.clientY - startY)),
+      });
+    };
+    const onUp = () => {
+      setIsResizing(false);
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+    };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  };
 
   return (
     <div
       className={cn(
-        'transition-all group relative rounded-sm',
+        'transition-all relative rounded-sm border',
         selected ? 'ring-1 ring-accent/40' : '',
-        theme === 'dark' ? 'bg-white/3' : 'bg-black/2'
+        theme === 'dark' ? 'bg-white/[0.03] border-white/5' : 'bg-white/80 border-slate-200'
       )}
-      style={{
-        width: data.width || 280,
-        height: data.height || 110,
-        minWidth: 120,
-        minHeight: 60,
-        resize: selected ? 'both' : 'none',
-        overflow: 'hidden',
-        cursor: 'default',
-      }}
-      onMouseUp={(e) => {
-        const el = e.currentTarget;
-        updateNodeData(id, { width: el.offsetWidth, height: el.offsetHeight });
-      }}
+      style={{ width: data.width || 280, height: data.height || 110, minWidth: 120, minHeight: 60, overflow: 'hidden' }}
     >
       {/* No NodeHandles — marketing notes are standalone */}
       <textarea
         className={cn(
           "w-full h-full bg-transparent border-none outline-none resize-none leading-relaxed p-3 placeholder:opacity-30",
-          theme === 'dark' ? "text-white placeholder:text-white" : "text-slate-700 placeholder:text-slate-400"
+          theme === 'dark' ? "text-white placeholder:text-white/30" : "text-slate-700 placeholder:text-slate-400"
         )}
         style={{
           fontFamily: data.fontFamily || 'Roboto',
@@ -614,6 +610,18 @@ export const FreeTextNode = memo(({ id, data, selected }: any) => {
         onMouseDown={(e) => e.stopPropagation()}
         onPointerDown={(e) => e.stopPropagation()}
       />
+      {/* Resize handle */}
+      {selected && (
+        <div
+          className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize flex items-end justify-end p-0.5"
+          onPointerDown={onResizeDragStart}
+          onClick={e => e.stopPropagation()}
+        >
+          <svg width="10" height="10" viewBox="0 0 10 10" className="text-accent opacity-60">
+            <path d="M9 1L1 9M9 5L5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        </div>
+      )}
       {selected && <FloatingToolbar id={id} data={data} />}
     </div>
   );

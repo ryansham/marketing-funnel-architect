@@ -49,7 +49,6 @@ export default function Sidebar() {
     redo,
     historyIndex,
     history,
-    showNumbers,
     theme,
     createGroup,
     ungroup,

@@ -36,19 +36,6 @@ const langDict = {
   },
 } as const;
 
-// ─── Channel Benchmarks ────────────────────────────────────────────────────────
-const CHANNEL_BENCHMARKS: Record<string, { ctr: number; cpc: number; cvr: number }> = {
-  'facebook':    { ctr: 0.9,  cpc: 0.97, cvr: 9.2  },
-  'instagram':   { ctr: 0.8,  cpc: 1.20, cvr: 7.0  },
-  'google-ads':  { ctr: 3.17, cpc: 2.32, cvr: 4.4  },
-  'youtube':     { ctr: 0.5,  cpc: 0.49, cvr: 3.0  },
-  'whatsapp':    { ctr: 28.0, cpc: 0.05, cvr: 45.0 },
-  'tiktok':      { ctr: 1.0,  cpc: 0.50, cvr: 5.0  },
-  'email':       { ctr: 2.6,  cpc: 0.10, cvr: 15.0 },
-  'form':        { ctr: 100,  cpc: 0.0,  cvr: 20.0 },
-  'wechat':      { ctr: 5.0,  cpc: 0.30, cvr: 12.0 },
-  'outdoor':     { ctr: 0.3,  cpc: 5.00, cvr: 1.5  },
-};
 
 import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import ReactFlow, { 
@@ -86,8 +73,6 @@ import {
   Smartphone,
   QrCode,
   LayoutGrid,
-  Eye,
-  EyeOff,
   Download,
   StickyNote,
   ExternalLink,
@@ -143,8 +128,6 @@ export default function App() {
     selectedNodeId,
     setNodes,
     setEdges,
-    showNumbers,
-    toggleNumbers,
     arrangeGrid,
     theme,
     setTheme,
@@ -864,20 +847,6 @@ export default function App() {
           </button>
           {!leftCollapsed['presets'] && <>
           <div className="space-y-2">
-            <ToolkitItem 
-              icon={LucideIcons.LayoutTemplate}
-              label="Browse Templates"
-              color="bg-accent"
-              onClick={() => setShowTemplates(true)}
-              theme={theme}
-            />
-            <ToolkitItem 
-              icon={Layers} 
-              label="Social Flow" 
-              color="bg-accent" 
-              onClick={() => confirmReplace(createDefaultSequence)} 
-              theme={theme} 
-            />
             {presets.map(p => (
               <ToolkitItem 
                 key={p.id} 
@@ -888,6 +857,13 @@ export default function App() {
                 theme={theme} 
               />
             ))}
+            <button
+              onClick={() => setShowTemplates(true)}
+              className={cn("w-full h-10 flex items-center gap-3 px-3 rounded-lg border transition-all text-xs font-bold text-left", theme === 'dark' ? "bg-white/[0.03] hover:bg-white/[0.08] border-border text-text-dim" : "bg-white border-slate-200 text-slate-600 hover:border-slate-400")}
+            >
+              <LucideIcons.LayoutTemplate size={14} />
+              Browse Templates
+            </button>
             <button 
               onClick={() => {
                 const name = prompt('Enter preset name:');
@@ -984,8 +960,6 @@ export default function App() {
                 <div className="w-[1px] h-5 bg-border mx-1 opacity-30" />
                 {/* Auto Arrange */}
                 <button onClick={() => arrangeGrid('grid')} className="p-2 rounded-lg transition-all text-text-dim hover:bg-black/5" title="Auto Arrange"><LucideIcons.LayoutGrid size={16} /></button>
-                {/* Toggle Metrics */}
-                <button onClick={toggleNumbers} className="p-2 rounded-lg transition-all text-text-dim hover:bg-black/5" title={showNumbers ? "Hide Metrics" : "Show Metrics"}>{showNumbers ? <LucideIcons.Eye size={16} /> : <LucideIcons.EyeOff size={16} />}</button>
                 {/* Cmd+K Search */}
                 <button onClick={() => setShowSearch(v => !v)} className={cn("p-2 rounded-lg transition-all", showSearch ? "bg-accent text-bg shadow-lg" : "text-text-dim hover:bg-black/5")} title="Search nodes (⌘K)"><LucideIcons.Search size={16} /></button>
                 {/* MiniMap toggle */}
@@ -1052,7 +1026,7 @@ export default function App() {
             const STEPS = [
               { icon: '🃏', title: 'Drag cards onto the canvas', body: 'Pick any channel from the left panel (Ads, Email, Social…) and drag it onto the canvas.' },
               { icon: '🔗', title: 'Connect cards', body: 'Hover a card to reveal its blue handles, then drag from a handle to another card to create a connection.' },
-              { icon: '⚙️', title: 'Configure each step', body: 'Click any card to open its settings on the right — set volume, CTR, notes and more.' },
+              { icon: '⚙️', title: 'Configure each step', body: 'Click any card to open its settings on the right — add notes, change channel, and style your funnel.' },
               { icon: '📤', title: 'Export your funnel', body: 'Use the Export button (top-right) to download as PNG, PDF or share as JSON.' },
             ];
             const step = STEPS[tourStep];
@@ -1086,65 +1060,110 @@ export default function App() {
 
           {/* ── Template chooser ─────────────────────────────────────────────── */}
           {showTemplates && (
-            <div className="fixed inset-0 z-[2500] flex items-center justify-center" onClick={() => setShowTemplates(false)}>
-              <div className={cn("w-[600px] rounded-2xl shadow-2xl border p-6 animate-in zoom-in-95", theme === 'dark' ? "bg-slate-900 border-white/10" : "bg-white border-slate-200")} onClick={e => e.stopPropagation()}>
-                <div className="flex items-center justify-between mb-5">
+            <div className="fixed inset-0 z-[2500] flex items-center justify-center bg-black/30 backdrop-blur-sm" onClick={() => setShowTemplates(false)}>
+              <div className={cn("w-[720px] max-h-[85vh] rounded-2xl shadow-2xl border flex flex-col animate-in zoom-in-95", theme === 'dark' ? "bg-slate-900 border-white/10" : "bg-white border-slate-200")} onClick={e => e.stopPropagation()}>
+                {/* Header */}
+                <div className="flex items-center justify-between p-6 pb-4 border-b border-border shrink-0">
                   <div>
-                    <div className="font-black text-base">Choose a Template</div>
-                    <div className="text-[11px] text-text-dim mt-0.5">Start with a pre-built campaign flow</div>
+                    <div className="font-black text-base">Choose a Campaign Template</div>
+                    <div className="text-[11px] text-text-dim mt-0.5">Each template comes with a full funnel flow, descriptions and strategic notes on every card</div>
                   </div>
                   <button onClick={() => setShowTemplates(false)} className="p-2 rounded-lg hover:bg-black/5 text-text-dim"><LucideIcons.X size={16} /></button>
                 </div>
-                <div className="grid grid-cols-3 gap-3">
-                  {[
-                    { key:'o2o', emoji:'🏪', title:'O2O Event', desc:'Drive online traffic to an offline event or pop-up', color:'bg-blue-50 border-blue-200' },
-                    { key:'leadgen', emoji:'🎯', title:'Lead Gen', desc:'Capture leads via ads → form → CRM nurture', color:'bg-purple-50 border-purple-200' },
-                    { key:'loyalty', emoji:'⭐', title:'Loyalty Program', desc:'Re-engage existing customers via WhatsApp & email', color:'bg-green-50 border-green-200' },
-                  ].map(tpl => (
-                    <button key={tpl.key} onClick={() => {
-                      setShowTemplates(false);
-                      const t2 = Date.now();
-                      if (tpl.key === 'leadgen') {
-                        const ga = 'lg-ga-'+t2, meta = 'lg-meta-'+t2, lp = 'lg-lp-'+t2, form = 'lg-form-'+t2, email = 'lg-email-'+t2;
-                        setNodes([
-                          {id:ga,type:'marketing',position:{x:80,y:200},data:{label:'Google Ads',type:'discovery',primaryChannel:'google-ads',volume:20000,ctr:3.2,cpc:1.5,note:'Search + Display campaign targeting high-intent keywords.'}},
-                          {id:meta,type:'marketing',position:{x:80,y:400},data:{label:'Meta Ads',type:'discovery',primaryChannel:'facebook',volume:18000,ctr:1.8,cpc:0.8,note:'Retargeting warm audiences and lookalike campaigns.'}},
-                          {id:lp,type:'landing',position:{x:420,y:200},data:{label:'Lead Capture Page',type:'owned',pageType:'Static Page',mockupModules:[{id:'m1',type:'Hero',label:'Hero'},{id:'m2',type:'Form',label:'Lead Form'}]}},
-                          {id:form,type:'marketing',position:{x:750,y:200},data:{label:'CRM Entry',type:'discovery',primaryChannel:'form',volume:0,ctr:0,cpc:0,note:'Lead data synced to CRM. Start 7-day nurture sequence.'}},
-                          {id:email,type:'marketing',position:{x:1060,y:200},data:{label:'Nurture Email',type:'discovery',primaryChannel:'email',volume:0,ctr:0,cpc:0,note:'Day 1: Welcome. Day 3: Case study. Day 7: Offer.'}},
-                        ]);
-                        setEdges([
-                          {id:'e1',source:ga,target:lp,sourceHandle:'right',targetHandle:'left',type:'custom'},
-                          {id:'e2',source:meta,target:lp,sourceHandle:'right',targetHandle:'left',type:'custom'},
-                          {id:'e3',source:lp,target:form,sourceHandle:'right',targetHandle:'left',type:'custom'},
-                          {id:'e4',source:form,target:email,sourceHandle:'right',targetHandle:'left',type:'custom'},
-                        ]);
-                      } else if (tpl.key === 'loyalty') {
-                        const wa = 'ly-wa-'+t2, email2 = 'ly-email-'+t2, lp2 = 'ly-lp-'+t2, qr = 'ly-qr-'+t2;
-                        setNodes([
-                          {id:wa,type:'marketing',position:{x:80,y:200},data:{label:'WhatsApp Blast',type:'discovery',primaryChannel:'whatsapp',volume:5000,ctr:28,cpc:0.05,note:'Personalized message to existing members with exclusive offer.'}},
-                          {id:email2,type:'marketing',position:{x:80,y:400},data:{label:'Re-engage Email',type:'discovery',primaryChannel:'email',volume:8000,ctr:2.6,cpc:0.1,note:'Segment by last purchase date. A/B test subject lines.'}},
-                          {id:lp2,type:'landing',position:{x:420,y:250},data:{label:'Member Rewards Page',type:'owned',pageType:'Static Page',mockupModules:[{id:'m1',type:'Hero',label:'Hero'},{id:'m2',type:'Redemption',label:'Redeem'},{id:'m3',type:'QR',label:'QR Code'}]}},
-                          {id:qr,type:'marketing',position:{x:760,y:250},data:{label:'Offline Redemption',type:'discovery',primaryChannel:'outdoor',volume:0,ctr:0,cpc:0,note:'Staff scans QR at POS. Reward credited instantly to CRM.'}},
-                        ]);
-                        setEdges([
-                          {id:'e1',source:wa,target:lp2,sourceHandle:'right',targetHandle:'left',type:'custom'},
-                          {id:'e2',source:email2,target:lp2,sourceHandle:'right',targetHandle:'left',type:'custom'},
-                          {id:'e3',source:lp2,target:qr,sourceHandle:'right',targetHandle:'left',type:'custom'},
-                        ]);
-                      } else {
-                        createDefaultSequence();
-                      }
-                    }} className={cn("flex flex-col items-start gap-2 p-4 rounded-xl border text-left transition-all hover:scale-[1.02] hover:shadow-lg", theme === 'dark' ? "bg-white/5 border-white/10 hover:border-accent/50" : tpl.color)}>
-                      <div className="text-2xl">{tpl.emoji}</div>
-                      <div className="font-black text-sm">{tpl.title}</div>
-                      <div className="text-[11px] text-text-dim leading-relaxed">{tpl.desc}</div>
-                    </button>
-                  ))}
+                {/* Templates grid */}
+                <div className="overflow-y-auto p-6">
+                  <div className="grid grid-cols-2 gap-3">
+                    {[
+                      { key:'o2o',      emoji:'🏪', title:'O2O Event Campaign',       desc:'Convert online audiences into offline event attendees. Combines paid ads, landing page registration and multi-channel confirmations.',             color:'border-blue-200 bg-blue-50/60' },
+                      { key:'leadgen',  emoji:'🎯', title:'Lead Generation Funnel',   desc:'Capture and nurture leads from Search & Social ads through a dedicated landing page into a CRM email sequence.',                                  color:'border-violet-200 bg-violet-50/60' },
+                      { key:'loyalty',  emoji:'⭐', title:'Loyalty Re-engagement',    desc:'Win back lapsed customers using WhatsApp and email blasts, directing them to a rewards page for offline redemption.',                              color:'border-amber-200 bg-amber-50/60' },
+                      { key:'product',  emoji:'🛍️', title:'New Product Launch',       desc:'Build hype and drive trial for a new product. Multi-channel awareness → landing page → purchase confirmation → post-sale follow-up.',            color:'border-rose-200 bg-rose-50/60' },
+                      { key:'webinar',  emoji:'🎓', title:'Webinar & Education',      desc:'Promote an online workshop or masterclass. Social + email ads drive registrations, automated reminders reduce no-shows.',                         color:'border-teal-200 bg-teal-50/60' },
+                      { key:'referral', emoji:'🤝', title:'Referral Programme',       desc:'Turn existing customers into brand advocates. Incentivise sharing via WhatsApp, track referral codes and reward both parties.',                    color:'border-green-200 bg-green-50/60' },
+                    ].map(tpl => (
+                      <button key={tpl.key} onClick={() => {
+                        setShowTemplates(false);
+                        const z = Date.now();
+                        const E = (src: string, tgt: string, eid: string) => ({id:eid,source:src,target:tgt,sourceHandle:'right',targetHandle:'left',type:'custom'});
+                        const TN = (id: string, pos: any, label: string, obj: string) => ({id,type:'title',position:pos,data:{label,label2:'Objective: '+obj,type:'title',fontFamily:'Montserrat',textAlign:'left'}});
+                        const MN = (id: string, pos: any, label: string, ch: string, note: string) => ({id,type:'marketing',position:pos,data:{label,type:'discovery',primaryChannel:ch,note}});
+                        const LN = (id: string, pos: any, label: string, mods: any[]) => ({id,type:'landing',position:pos,data:{label,type:'owned',pageType:'Static Page',mockupModules:mods}});
+                        const TX = (id: string, pos: any, note: string) => ({id,type:'text',position:pos,data:{label:'Note',note,type:'text',fontFamily:'Roboto',fontSize:13,width:240,height:90}});
+
+                        if (tpl.key === 'o2o') {
+                          createDefaultSequence();
+                        } else if (tpl.key === 'leadgen') {
+                          const [ga,me,lp,fr,em,ti] = ['lg-ga','lg-me','lg-lp','lg-fr','lg-em','lg-ti'].map(x=>x+z);
+                          setNodes([
+                            TN(ti,{x:80,y:20},'Lead Generation Funnel','Capture high-intent leads from paid search and social, convert them on a dedicated landing page, and nurture with automated email sequences.'),
+                            MN(ga,{x:80,y:280},'Google Search Ads','google-ads','Target users actively searching for your solution. Use SKAG (single keyword ad groups) for precise match and quality score optimisation. Bid on competitor names for steal opportunities.'),
+                            MN(me,{x:80,y:480},'Meta Lead Ads','facebook','Run native lead-gen forms on Facebook & Instagram to reduce friction. Audience: custom lookalikes from existing customer list + interest-based cold audiences.'),
+                            LN(lp,{x:420,y:180},'Lead Capture Page',[{id:'m1',type:'Hero',label:'Value Proposition'},{id:'m2',type:'Features',label:'Key Benefits'},{id:'m3',type:'Form',label:'Lead Form'},{id:'m4',type:'CTA',label:'Submit CTA'}]),
+                            MN(fr,{x:760,y:280},'CRM Entry & Tagging','form','On form submit: tag lead source, score lead (hot/warm/cold), trigger 7-day drip sequence. Integrate with HubSpot or Salesforce via webhook.'),
+                            MN(em,{x:1080,y:280},'Email Nurture Sequence','email','Day 1: Welcome + free resource. Day 3: Case study. Day 5: Objection handling FAQ. Day 7: Limited-time offer with urgency CTA.'),
+                          ]);
+                          setEdges([E(ga,lp,'e1'),E(me,lp,'e2'),E(lp,fr,'e3'),E(fr,em,'e4')]);
+                        } else if (tpl.key === 'loyalty') {
+                          const [wa,em,lp,qr,ti] = ['ly-wa','ly-em','ly-lp','ly-qr','ly-ti'].map(x=>x+z);
+                          setNodes([
+                            TN(ti,{x:80,y:20},'Loyalty Re-engagement Campaign','Reactivate lapsed members using personalised WhatsApp and email outreach, directing them to a rewards page for exclusive offline redemption.'),
+                            MN(wa,{x:80,y:280},'WhatsApp Re-engagement','whatsapp','Send personalised "We miss you" message with first-name merge tag. Include exclusive returning-member offer (e.g. double points this weekend). Send Friday 6pm for weekend redemption uplift.'),
+                            MN(em,{x:80,y:480},'Re-engagement Email','email','Subject: "[Name], your reward expires soon 🎁". Segment by: last purchase > 90 days. A/B test: discount vs. experience-based reward offer.'),
+                            LN(lp,{x:420,y:280},'Member Rewards Page',[{id:'m1',type:'Hero',label:'Exclusive Offer Banner'},{id:'m2',type:'Subscription',label:'Member Club'},{id:'m3',type:'Redemption',label:'Reward Offer'},{id:'m4',type:'QR',label:'Redemption QR'}]),
+                            MN(qr,{x:760,y:280},'Offline Redemption','outdoor','Staff scans QR at POS terminal. System auto-validates and credits reward. Track redemption rate per channel. Target: >25% redemption rate.'),
+                          ]);
+                          setEdges([E(wa,lp,'e1'),E(em,lp,'e2'),E(lp,qr,'e3')]);
+                        } else if (tpl.key === 'product') {
+                          const [ig,tt,lp,wa,em,ti] = ['pl-ig','pl-tt','pl-lp','pl-wa','pl-em','pl-ti'].map(x=>x+z);
+                          setNodes([
+                            TN(ti,{x:80,y:20},'New Product Launch Funnel','Build pre-launch hype on social, convert interest on a product landing page, then activate purchasers via WhatsApp for advocacy and repeat purchase.'),
+                            MN(ig,{x:80,y:280},'Instagram Awareness','instagram','Teaser content: "Something big is coming". Use countdown stickers in Stories. Collaborate with 3–5 micro-influencers (10k–100k) for authentic reach. Swipe-up link to waitlist page.'),
+                            MN(tt,{x:80,y:480},'TikTok Launch Video','tiktok','Product demo / unboxing video. Hook in first 2 seconds. Challenge hashtag for UGC. Paid boost on top-performing organic content (whitelist creator account for ads).'),
+                            LN(lp,{x:420,y:280},'Product Launch Page',[{id:'m1',type:'Hero',label:'Hero Banner'},{id:'m2',type:'Features',label:'Product Benefits'},{id:'m3',type:'CTA',label:'Buy Now / Pre-order'},{id:'m4',type:'Subscription',label:'Notify Me'}]),
+                            MN(wa,{x:760,y:280},'WhatsApp Order Confirmation','whatsapp','Immediate purchase confirmation with order summary. Share link to unboxing guide / setup tutorial. Prompt for first review with incentive (loyalty points).'),
+                            MN(em,{x:760,y:480},'Post-purchase Email','email','Day 0: Order confirmation + tracking. Day 3: Onboarding tips. Day 14: "How are you enjoying it?" + review request. Day 30: Cross-sell accessory.'),
+                          ]);
+                          setEdges([E(ig,lp,'e1'),E(tt,lp,'e2'),E(lp,wa,'e3'),E(lp,em,'e4')]);
+                        } else if (tpl.key === 'webinar') {
+                          const [ga,em,lp,wa,ev,ti] = ['wb-ga','wb-em','wb-lp','wb-wa','wb-ev','wb-ti'].map(x=>x+z);
+                          setNodes([
+                            TN(ti,{x:80,y:20},'Webinar & Education Funnel','Drive registrations for an online masterclass using paid search and email, reduce no-shows with WhatsApp reminders, and convert attendees post-event.'),
+                            MN(ga,{x:80,y:280},'Google Search Ads','google-ads','Target: "[Topic] training", "[Topic] course", "how to [outcome]". Landing page = registration. Remarketing list for past site visitors. Set max CPA target bid.'),
+                            MN(em,{x:80,y:480},'Email Invitation','email','Send to existing list segments. Subject: "Free Masterclass: [Outcome in 60 mins]". Personalise by industry. 3-touch sequence: invite → reminder → last-chance.'),
+                            LN(lp,{x:420,y:280},'Webinar Registration Page',[{id:'m1',type:'Hero',label:'Event Details'},{id:'m2',type:'Features',label:'What You'll Learn'},{id:'m3',type:'Form',label:'Register Now'},{id:'m4',type:'CTA',label:'Add to Calendar'}]),
+                            MN(wa,{x:760,y:180},'WhatsApp Reminders','whatsapp','T-24h: "See you tomorrow! Here's your join link 👇". T-1h: "Starting soon — click to join". T+0: Live link drop. T+24h: Recording link + next steps.'),
+                            MN(ev,{x:760,y:380},'Post-Webinar Follow-up','email','Within 1h: Recording + slides link. Day 2: Key takeaways summary. Day 4: Related resource / offer. Day 7: 1:1 consultation CTA for hot leads.'),
+                          ]);
+                          setEdges([E(ga,lp,'e1'),E(em,lp,'e2'),E(lp,wa,'e3'),E(lp,ev,'e4')]);
+                        } else if (tpl.key === 'referral') {
+                          const [wa,em,lp,fr,rw,ti] = ['rf-wa','rf-em','rf-lp','rf-fr','rf-rw','rf-ti'].map(x=>x+z);
+                          setNodes([
+                            TN(ti,{x:80,y:20},'Referral Programme Funnel','Activate existing customers as brand advocates through a structured referral programme, rewarding both referrer and new customer at conversion.'),
+                            MN(wa,{x:80,y:280},'WhatsApp Referral Invite','whatsapp','Send to top 20% of customers by purchase frequency. Message: "You're one of our best customers — share your link and earn [reward] for every friend who buys." Include unique referral code.'),
+                            MN(em,{x:80,y:480},'Email Referral Invite','email','Segment: customers with 2+ purchases in last 6 months. Subject: "Earn $[X] for every friend you refer 🎁". Include referral link + social sharing buttons.'),
+                            LN(lp,{x:420,y:280},'Referral Landing Page',[{id:'m1',type:'Hero',label:'Referral Offer'},{id:'m2',type:'Features',label:'How It Works'},{id:'m3',type:'Form',label:'Sign Up Form'},{id:'m4',type:'CTA',label:'Share My Link'}]),
+                            MN(fr,{x:760,y:280},'New Customer Registration','form','Capture referee details. Auto-apply referrer's code. Trigger: referrer notification via WhatsApp "Your friend just signed up! Your reward is on its way."'),
+                            MN(rw,{x:1080,y:280},'Reward Delivery','email','Both parties receive reward confirmation. Referrer: credit/voucher + "Share again" prompt. Referee: welcome offer + onboarding sequence start.'),
+                          ]);
+                          setEdges([E(wa,lp,'e1'),E(em,lp,'e2'),E(lp,fr,'e3'),E(fr,rw,'e4')]);
+                        }
+                      }} className={cn("flex flex-col items-start gap-2 p-4 rounded-xl border text-left transition-all hover:scale-[1.01] hover:shadow-md active:scale-100", theme === 'dark' ? "bg-white/5 border-white/10 hover:border-accent/40" : tpl.color)}>
+                        <div className="text-2xl">{tpl.emoji}</div>
+                        <div className="font-black text-sm leading-tight">{tpl.title}</div>
+                        <div className="text-[11px] text-text-dim leading-relaxed">{tpl.desc}</div>
+                        <div className={cn("mt-1 text-[9px] font-black uppercase tracking-widest", theme === 'dark' ? "text-accent/60" : "text-slate-400")}>
+                          View template →
+                        </div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
-                <div className="mt-4 pt-4 border-t border-border">
-                  <button onClick={() => { setShowTemplates(false); }} className="text-[11px] text-text-dim hover:text-accent transition-colors">
-                    → Start with blank canvas instead
+                <div className="px-6 py-4 border-t border-border shrink-0 flex items-center justify-between">
+                  <button onClick={() => { setShowTemplates(false); setNodes([]); setEdges([]); }} className="text-[11px] text-text-dim hover:text-accent transition-colors">
+                    → Start with blank canvas
+                  </button>
+                  <button onClick={() => setShowTemplates(false)} className={cn("px-4 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider transition-all", theme === 'dark' ? "bg-white/10 text-white hover:bg-white/20" : "bg-slate-100 text-slate-600 hover:bg-slate-200")}>
+                    Cancel
                   </button>
                 </div>
               </div>
@@ -1348,69 +1367,14 @@ function ShortcutsHelper({ theme }: { theme: 'dark' | 'light' }) {
   );
 }
 
-function StatGroup({ label, value, theme }: { label: string; value: string; theme: 'dark' | 'light' }) {
-  return (
-    <div className="flex items-baseline gap-2">
-      <span className={cn(
-        "text-[10px] font-black tracking-widest",
-        theme === 'dark' ? "text-text-dim" : "text-slate-400"
-      )}>{label}:</span>
-      <span className="text-sm font-bold text-accent">{value}</span>
-    </div>
-  );
-}
-
 function Footer({ theme }: { theme: 'dark' | 'light' }) {
-  const { nodes, showNumbers } = useStore();
-  const { edges: allEdges } = useStore();
-  // Funnel drop-off: for each edge, compute conversion from source CTR
-  const funnelSteps = React.useMemo(() => {
-    return allEdges.map(e => {
-      const src = nodes.find(n => n.id === e.source);
-      if (!src || !src.data?.volume || !src.data?.ctr) return null;
-      const reach = src.data.volume;
-      const clicks = Math.round(reach * (src.data.ctr / 100));
-      const dropOff = reach - clicks;
-      return { label: src.data.label || '?', reach, clicks, dropOff, dropPct: ((dropOff / reach) * 100).toFixed(0) };
-    }).filter(Boolean);
-  }, [nodes, allEdges]);
-  const totalConversions = nodes.reduce((acc, node) => {
-    if (node.data?.type === 'physical') {
-      const dropoff = 1 - ((node.data?.physicalDropoff || 20) / 100);
-      return acc + ((node.data?.volume || 0) * dropoff);
-    }
-    return acc;
-  }, 0);
-  const totalBudget = nodes.reduce((acc, node) => acc + ((node.data?.volume || 0) * (node.data?.cpc || 0.5)), 0);
-
-  const footerClass = cn(
-    "col-span-full border-t flex items-center px-6 gap-10",
-    theme === 'dark' ? "bg-sidebar border-border" : "bg-white border-slate-200"
-  );
-
-  if (!showNumbers) {
-    return (
-      <footer className={footerClass}>
-        <span className="text-[10px] font-black tracking-widest text-text-dim opacity-50">Campaign metrics hidden</span>
-      </footer>
-    );
-  }
-
   return (
-    <footer className={footerClass}>
-      <StatGroup label="Total Budget" value={`HK$${totalBudget.toLocaleString()}`} theme={theme} />
-      <StatGroup label="Est. Physical Leads" value={Math.round(totalConversions).toLocaleString()} theme={theme} />
-      <StatGroup label="CPA (Offline)" value={`HK$${(totalBudget / (totalConversions || 1)).toFixed(2)}`} theme={theme} />
-      <div className="flex-1" />
-      <button 
-        onClick={() => (window as any).toggleShortcuts?.()}
-        className={cn(
-          "flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all focus:outline-none",
-          theme === 'dark' ? "text-text-dim hover:bg-white/5 hover:text-white" : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"
-        )}
-      >
-        <LucideIcons.Keyboard size={14} /> Shortcuts
-      </button>
+    <footer className={cn(
+      "col-span-full border-t flex items-center px-6 gap-4 text-[10px] text-text-dim opacity-40",
+      theme === 'dark' ? "bg-sidebar border-border" : "bg-white border-slate-200"
+    )}>
+      <span className="font-black tracking-widest uppercase">Marketing Funnel Architect</span>
+      <span>©ryansham.martechtalks</span>
     </footer>
   );
 }
