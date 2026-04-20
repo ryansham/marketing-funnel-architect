@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from 'react';
-import { Handle, Position, NodeResizer, BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow';
+import { Handle, Position, NodeResizer, BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '../lib/utils';
 import { NodeType, MockupModule } from '../types';
@@ -743,10 +743,9 @@ export const CustomEdge = memo(({
   const isDimmed       = !!selectedNodeId && !isHighlighted && !selected;
 
   // Bezier routing — reliable across all ReactFlow 11 versions
-  const [edgePath, labelX, labelY] = getSmoothStepPath({
+  const [edgePath, labelX, labelY] = getBezierPath({
     sourceX, sourceY, sourcePosition,
     targetX, targetY, targetPosition,
-    borderRadius: 8,
   });
 
   const edgeColor = isHighlighted

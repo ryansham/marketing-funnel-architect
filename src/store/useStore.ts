@@ -57,7 +57,7 @@ export const useStore = create<AppState>((set, get) => ({
         type: MarkerType.ArrowClosed,
         color: get().theme === 'dark' ? '#64748b' : '#94a3b8',
       },
-      type: 'smoothstep',
+      type: 'custom',
     };
     set({
       edges: addEdge(edge, get().edges),

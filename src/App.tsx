@@ -458,9 +458,9 @@ export default function App() {
     );
 
     const newEdges = [
-      { id: `e-${fbId}-${landingId}`, source: fbId, target: landingId, sourceHandle: 'right', targetHandle: 'left', type: 'smoothstep' },
-      { id: `e-${landingId}-${formId}`, source: landingId, target: formId, sourceHandle: 'right', targetHandle: 'left', type: 'smoothstep' },
-      { id: `e-${formId}-${emailId}`, source: formId, target: emailId, sourceHandle: 'right', targetHandle: 'left', type: 'smoothstep' },
+      { id: `e-${fbId}-${landingId}`, source: fbId, target: landingId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+      { id: `e-${landingId}-${formId}`, source: landingId, target: formId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+      { id: `e-${formId}-${emailId}`, source: formId, target: emailId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
     ];
 
     setNodes(newNodes);
@@ -786,11 +786,10 @@ export default function App() {
           panOnScrollMode={undefined} // Allows both
           style={{ background: 'transparent' }}
           defaultEdgeOptions={{
-            type: 'smoothstep',
+            type: 'custom',
             style: { strokeWidth: 1.5 },
           }}
           connectionLineStyle={{ stroke: '#38bdf8', strokeWidth: 2 }}
-          connectionLineType={'smoothstep' as any}
         >
           <Background 
             color={theme === 'dark' ? "#1e293b" : "#e2e8f0"} 
