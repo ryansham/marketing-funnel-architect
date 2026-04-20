@@ -152,35 +152,7 @@ body {
   display: none !important;
 }
 
-/* ── REACT QUILL ─────────────────────────────────────────────────────────────*/
-.ql-container.ql-snow {
-  border: none !important;
-  font-family: inherit !important;
-  background: transparent !important;
-}
-
-.ql-editor {
-  padding: 8px !important;
-  color: inherit !important;
-  font-size: 13px !important;
-  line-height: 1.5 !important;
-}
-
-.ql-editor.ql-blank::before {
-  color: var(--text-dim) !important;
-  opacity: 0.5 !important;
-  font-style: italic !important;
-}
-
-.light .rich-editor-canvas .ql-editor.ql-blank::before {
-  color: #000000 !important;
-  opacity: 1 !important;
-  font-style: normal !important;
-}
-
-.rich-editor-canvas .ql-editor {
-  height: 100% !important;
-}
+/* react-quill-new removed — using native textarea instead */
 
 /* ── EXPORT VIEW ─────────────────────────────────────────────────────────────*/
 .is-exporting .react-flow__handle,

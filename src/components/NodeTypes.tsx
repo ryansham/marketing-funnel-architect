@@ -3,8 +3,7 @@ import { Handle, Position, NodeResizer, BaseEdge, EdgeLabelRenderer, getBezierPa
 import * as LucideIcons from 'lucide-react';
 import { cn } from '../lib/utils';
 import { NodeType, MockupModule } from '../types';
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+
 
 import { useStore } from '../store/useStore';
 
@@ -439,9 +438,14 @@ export const StickyNoteNode = memo(({ id, data, selected }: any) => {
 
       <div className="absolute top-0 right-0 w-8 h-8 bg-gradient-to-bl from-yellow-300 to-transparent pointer-events-none opacity-30" />
 
-      <div className="flex-1 overflow-hidden h-full flex flex-col no-toolbar-editor quill-wrapper" onMouseDown={(e) => e.stopPropagation()} onPointerDown={(e) => e.stopPropagation()}>
-        <ReactQuill theme="snow" value={data.note || ''} onChange={(val) => updateNodeData(id, { note: val })} modules={{ toolbar: false }} placeholder="New sticky note..." className="rich-editor-canvas h-full text-slate-800" />
-      </div>
+      <textarea
+        className="flex-1 w-full h-full bg-transparent border-none outline-none resize-none text-slate-800 text-[13px] leading-relaxed p-2 font-sans placeholder:text-slate-400"
+        placeholder="New sticky note..."
+        value={data.note?.replace(/<[^>]*>/g, '') || ''}
+        onChange={(e) => updateNodeData(id, { note: e.target.value })}
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+      />
     </div>
   );
 });
@@ -527,14 +531,18 @@ export const FreeTextNode = memo(({ id, data, selected }: any) => {
     <div className={cn('p-2 transition-all group relative', selected ? 'ring-1 ring-accent/30' : '')} style={{ width: data.width || 220, height: data.height || 100, minWidth: 100 }}>
       <NodeHandles visible={selected || isConnecting} color="#38bdf8" />
       <NodeResizer minWidth={100} isVisible={selected} onResize={(_, { width, height }) => updateNodeData(id, { width, height })} />
-      <div
-        className="flex-1 overflow-hidden h-full flex flex-col no-toolbar-editor quill-wrapper"
-        onMouseDown={(e) => { if ((e.target as HTMLElement).closest('.ql-editor')) e.stopPropagation(); }}
-        onPointerDown={(e) => { if ((e.target as HTMLElement).closest('.ql-editor')) e.stopPropagation(); }}
-        style={{ fontFamily: data.fontFamily || 'Dancing Script', textAlign: data.textAlign || 'left', letterSpacing: `${data.letterSpacing || 0}px`, lineHeight: data.lineHeight || 1.4, color: theme === 'dark' ? 'white' : 'black' }}
-      >
-        <ReactQuill theme="snow" value={data.note || ''} onChange={(val) => updateNodeData(id, { note: val })} modules={{ toolbar: false }} placeholder="Marketing notes..." className={cn('rich-editor-canvas h-full', theme === 'light' ? 'text-black' : 'text-white')} />
-      </div>
+      <textarea
+        className={cn(
+          "flex-1 w-full h-full bg-transparent border-none outline-none resize-none text-[13px] leading-relaxed p-2 placeholder:opacity-40",
+          theme === 'dark' ? "text-white placeholder:text-white" : "text-black placeholder:text-black"
+        )}
+        style={{ fontFamily: data.fontFamily || 'Dancing Script', textAlign: (data.textAlign as any) || 'left', letterSpacing: `${data.letterSpacing || 0}px`, lineHeight: data.lineHeight || 1.4, fontSize: data.fontSize ? `${data.fontSize}px` : '18px' }}
+        placeholder="Marketing notes..."
+        value={data.note?.replace(/<[^>]*>/g, '') || ''}
+        onChange={(e) => updateNodeData(id, { note: e.target.value })}
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+      />
       {selected && <FloatingToolbar id={id} data={data} />}
     </div>
   );
