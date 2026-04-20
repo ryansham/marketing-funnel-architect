@@ -236,23 +236,6 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
           </div>
         </div>
 
-        {/* Benchmark indicator for discovery/ads cards */}
-        {isDiscovery && bench && showNumbers && (
-          <div className="mt-1 text-[8px] font-mono opacity-40 text-center whitespace-nowrap">
-            avg CTR {bench.ctr}% · CPC ${bench.cpc}
-          </div>
-        )}
-
-        {/* Benchmark hover tooltip */}
-        {isDiscovery && bench && selected && (
-          <div className={cn(
-            'absolute -top-9 left-1/2 -translate-x-1/2 text-[9px] font-bold whitespace-nowrap px-2.5 py-1 rounded-full border z-50 pointer-events-none shadow-lg',
-            theme === 'dark' ? 'bg-slate-800 border-white/10 text-white/80' : 'bg-white border-slate-200 text-slate-600 shadow-sm'
-          )}>
-            ↑ Industry: CTR {bench.ctr}% · CPC ${bench.cpc}
-          </div>
-        )}
-
         {/* Note — always visible and editable on both discovery + non-discovery cards */}
         <textarea
           className={cn(
