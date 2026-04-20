@@ -1,3 +1,4 @@
+/* Copyright@ryansham.martechtalks_ryansham.com */
 import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import ReactFlow, { 
   Background, 
@@ -115,6 +116,9 @@ export default function App() {
   } = useStore();
 
   const [spawnOffset, setSpawnOffset] = React.useState(0);
+
+  // Set document title
+  React.useEffect(() => { document.title = 'Marketing Funnel Architect'; }, []);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [menu, setMenu] = useState<{ id?: string, type?: string, top?: number, left?: number, right?: number, bottom?: number } | null>(null);
 

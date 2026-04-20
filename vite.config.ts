@@ -15,9 +15,24 @@ export default defineConfig(({mode}) => {
         '@': path.resolve(__dirname, '.'),
       },
     },
+    optimizeDeps: {
+      include: [
+        'react-quill-new',
+        'reactflow',
+        '@reactflow/node-resizer',
+      ],
+    },
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'reactflow-vendor': ['reactflow', '@reactflow/node-resizer'],
+            'quill-vendor': ['react-quill-new'],
+          },
+        },
+      },
+    },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
-      // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
     },
   };
