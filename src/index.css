@@ -75,7 +75,7 @@ body {
   pointer-events: all !important;
 }
 
-/* ── HANDLES: always visible but subtle; glow on hover ───────────────────────*/
+/* ── HANDLES: show on hover/select ──────────────────────────────────────────*/
 .react-flow__handle {
   width: 10px !important;
   height: 10px !important;
@@ -83,36 +83,44 @@ body {
   border: 2px solid white !important;
   background-color: var(--accent) !important;
   opacity: 0;
-  transition: opacity 0.15s, transform 0.15s, box-shadow 0.15s !important;
+  transition: opacity 0.15s, transform 0.15s !important;
+  cursor: crosshair !important;
 }
-
-/* Show handles when the node is hovered OR selected */
 .react-flow__node:hover .react-flow__handle,
 .react-flow__node.selected .react-flow__handle {
-  opacity: 1;
+  opacity: 1 !important;
 }
-
 .react-flow__handle:hover {
+  transform: scale(1.5) !important;
+  box-shadow: 0 0 0 5px rgba(56,189,248,0.25) !important;
+}
+.react-flow__handle-connecting {
+  opacity: 1 !important;
   transform: scale(1.4) !important;
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent) !important;
 }
 
-/* ── EDGES: solid lines, visible arrows ──────────────────────────────────────*/
+/* ── EDGES: SmoothStep solid lines ───────────────────────────────────────────*/
 .react-flow__edge-path {
   stroke-width: 1.5px !important;
   stroke: #94a3b8;
+  stroke-dasharray: none !important;
+  animation: none !important;
+  transition: stroke 0.2s, stroke-width 0.15s;
 }
-
 .react-flow__edge.selected .react-flow__edge-path,
 .react-flow__edge:hover .react-flow__edge-path {
   stroke: var(--accent) !important;
-  stroke-width: 2px !important;
+  stroke-width: 2.5px !important;
+  filter: drop-shadow(0 0 4px rgba(56,189,248,0.5));
 }
-
-/* Remove dashes from animated edges — use solid lines instead */
-.react-flow__edge-path {
-  stroke-dasharray: none !important;
-  animation: none !important;
+.react-flow__connection-path {
+  stroke: var(--accent) !important;
+  stroke-width: 2px !important;
+  stroke-dasharray: 5 5 !important;
+  animation: dash 0.5s linear infinite !important;
+}
+@keyframes dash {
+  to { stroke-dashoffset: -10; }
 }
 
 /* ── NODES: smooth hover lift ────────────────────────────────────────────────*/

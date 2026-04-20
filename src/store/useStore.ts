@@ -48,15 +48,16 @@ export const useStore = create<AppState>((set, get) => ({
     if (existing) return;
 
     const edge = { 
-      ...connection, 
+      ...connection,
+      sourceHandle: connection.sourceHandle || 'right',
+      targetHandle: connection.targetHandle || 'left',
       id: `e-${connection.source}-${connection.target}-${Date.now()}`,
-      animated: true,
       style: { stroke: get().theme === 'dark' ? '#64748b' : '#94a3b8' },
       markerEnd: {
         type: MarkerType.ArrowClosed,
         color: get().theme === 'dark' ? '#64748b' : '#94a3b8',
       },
-      type: 'custom',
+      type: 'smoothstep',
     };
     set({
       edges: addEdge(edge, get().edges),
@@ -250,6 +251,7 @@ export const useStore = create<AppState>((set, get) => ({
       type: 'group',
       position: { x: minX - padding, y: minY - padding },
       style: { width: (maxX - minX) + padding * 2, height: (maxY - minY) + padding * 2, pointerEvents: 'none' as unknown as undefined },
+      selectable: false,
       data: { label: 'New Group', type: 'group', volume: 0, ctr: 0, cpc: 0 }
     };
 

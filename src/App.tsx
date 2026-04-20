@@ -412,9 +412,9 @@ export default function App() {
     ];
 
     const newEdges = [
-      { id: `e-${fbId}-${landingId}`, source: fbId, target: landingId, type: 'custom' },
-      { id: `e-${landingId}-${formId}`, source: landingId, target: formId, type: 'custom' },
-      { id: `e-${formId}-${emailId}`, source: formId, target: emailId, type: 'custom' },
+      { id: `e-${fbId}-${landingId}`, source: fbId, target: landingId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+      { id: `e-${landingId}-${formId}`, source: landingId, target: formId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
+      { id: `e-${formId}-${emailId}`, source: formId, target: emailId, sourceHandle: 'right', targetHandle: 'left', type: 'custom' },
     ];
 
     setNodes(newNodes);
@@ -739,12 +739,34 @@ export default function App() {
           panOnScroll={true}
           panOnScrollMode={undefined} // Allows both
           style={{ background: 'transparent' }}
+          defaultEdgeOptions={{
+            type: 'smoothstep',
+            style: { strokeWidth: 1.5 },
+          }}
+          connectionLineStyle={{ stroke: '#38bdf8', strokeWidth: 2 }}
+          connectionLineType={'smoothstep' as any}
         >
           <Background 
-            color={theme === 'dark' ? "#1e293b" : "#cbd5e1"} 
-            variant={BackgroundVariant.Dots} 
-            gap={20} 
-            size={1} 
+            color={theme === 'dark' ? "#1e293b" : "#e2e8f0"} 
+            variant={BackgroundVariant.Lines}
+            gap={24}
+            lineWidth={0.5}
+          />
+
+          <MiniMap
+            nodeStrokeWidth={3}
+            nodeColor={(n) => {
+              if (n.type === 'marketing') return n.data?.primaryChannel === 'facebook' ? '#1877F2' : '#3b82f6';
+              if (n.type === 'landing') return '#a855f7';
+              if (n.type === 'shape') return '#38bdf8';
+              return '#94a3b8';
+            }}
+            maskColor={theme === 'dark' ? 'rgba(2,6,23,0.7)' : 'rgba(248,250,252,0.7)'}
+            className={cn(
+              "!rounded-xl !border !shadow-2xl",
+              theme === 'dark' ? "!bg-slate-900 !border-white/10" : "!bg-white !border-slate-200"
+            )}
+            style={{ bottom: 80, right: 16 }}
           />
 
           <Panel position="bottom-left" className="flex items-end gap-2 mb-2 ml-2">
@@ -1163,7 +1185,6 @@ function ContextMenu({
         "fixed z-[1000] min-w-[180px] rounded-xl shadow-2xl border p-1 animate-in zoom-in-95 duration-100",
         theme === 'dark' ? "bg-slate-900 border-white/10" : "bg-white border-slate-200 shadow-slate-200/50"
       )}
-      onMouseLeave={onClick}
     >
       <div className="flex flex-col gap-0.5">
         {isNode && (

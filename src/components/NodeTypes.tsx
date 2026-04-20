@@ -1,5 +1,5 @@
 import React, { memo, useMemo } from 'react';
-import { Handle, Position, NodeResizer, BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
+import { Handle, Position, NodeResizer, BaseEdge, EdgeLabelRenderer, getSmoothStepPath } from 'reactflow';
 import * as LucideIcons from 'lucide-react';
 import { cn } from '../lib/utils';
 import { NodeType, MockupModule } from '../types';
@@ -117,15 +117,17 @@ function useHighlight(id: string) {
 // ─── Shared Handle set ─────────────────────────────────────────────────────────
 
 function NodeHandles({ visible, color = '#38bdf8' }: { visible: boolean; color?: string }) {
-  // Always render handles but hide them via CSS opacity unless visible
-  const cls = `!w-3 !h-3 !border-2 !border-white/80 transition-all duration-150`;
-  const style = { backgroundColor: color, opacity: visible ? 1 : 0, transition: 'opacity 0.15s' };
+  // Primary handles (left/right) — always rendered, shown on hover/select via CSS
+  const primaryCls = `!w-3 !h-3 !border-2 !border-white !rounded-full transition-all duration-150 hover:!scale-150`;
+  const secondaryCls = `!w-2.5 !h-2.5 !border-2 !border-white/70 !rounded-full transition-all duration-150`;
+  const primaryStyle = { backgroundColor: color, opacity: visible ? 1 : 0, transition: 'opacity 0.15s' };
+  const secondaryStyle = { backgroundColor: color, opacity: visible ? 0.6 : 0, transition: 'opacity 0.15s' };
   return (
     <>
-      <Handle id="left"   type="target" position={Position.Left}   className={cn(cls, '!-left-1.5')}   style={style} />
-      <Handle id="top"    type="target" position={Position.Top}    className={cn(cls, '!-top-1.5')}    style={style} />
-      <Handle id="bottom" type="source" position={Position.Bottom} className={cn(cls, '!-bottom-1.5')} style={style} />
-      <Handle id="right"  type="source" position={Position.Right}  className={cn(cls, '!-right-1.5')}  style={style} />
+      <Handle id="left"   type="target" position={Position.Left}   className={cn(primaryCls, '!-left-1.5')}   style={primaryStyle} />
+      <Handle id="right"  type="source" position={Position.Right}  className={cn(primaryCls, '!-right-1.5')}  style={primaryStyle} />
+      <Handle id="top"    type="target" position={Position.Top}    className={cn(secondaryCls, '!-top-1.5')}    style={secondaryStyle} />
+      <Handle id="bottom" type="source" position={Position.Bottom} className={cn(secondaryCls, '!-bottom-1.5')} style={secondaryStyle} />
     </>
   );
 }
@@ -599,7 +601,15 @@ export const ShapeNode = memo(({ id, data, selected }: any) => {
           <div className="w-full" style={{ borderBottom: `${data.strokeWidth || 2}px ${type === 'dotted-line' ? 'dashed' : 'solid'} ${data.strokeColor || '#38bdf8'}` }} />
         </div>
       ) : (
-        <div className={cn('w-full h-full border transition-all duration-200', type === 'circle' ? 'rounded-full' : 'rounded-sm')} style={{ backgroundColor: data.fillColor || '#38bdf8', borderColor: data.strokeColor || '#38bdf8', borderWidth: `${data.strokeWidth || 2}px` }} />
+        <div className={cn('w-full h-full border transition-all duration-200 relative', type === 'circle' ? 'rounded-full' : 'rounded-sm')} style={{ backgroundColor: data.fillColor || '#38bdf8', borderColor: data.strokeColor || '#38bdf8', borderWidth: `${data.strokeWidth || 2}px` }}>
+          {/* Label badge for background containers */}
+          {data.label && (data.fillColor?.includes('rgba') || data.fillColor?.includes('0.')) && (
+            <div className="absolute -top-5 left-2 flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest" style={{ color: data.strokeColor || '#38bdf8', backgroundColor: theme === 'dark' ? 'rgba(2,6,23,0.8)' : 'rgba(248,250,252,0.9)' }}>
+              <LucideIcons.Layers size={9} />
+              {data.label}
+            </div>
+          )}
+        </div>
       )}
     </div>
   );
@@ -729,9 +739,10 @@ export const CustomEdge = memo(({
   const isDimmed       = !!selectedNodeId && !isHighlighted && !selected;
 
   // Bezier routing — reliable across all ReactFlow 11 versions
-  const [edgePath, labelX, labelY] = getBezierPath({
+  const [edgePath, labelX, labelY] = getSmoothStepPath({
     sourceX, sourceY, sourcePosition,
     targetX, targetY, targetPosition,
+    borderRadius: 8,
   });
 
   const edgeColor = isHighlighted
