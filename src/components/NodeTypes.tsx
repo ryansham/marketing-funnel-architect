@@ -600,9 +600,6 @@ export const ShapeNode = memo(({ id, data, selected }: any) => {
         </>
       )}
 
-      {selected && (
-      )}
-
       {type === 'line' || type === 'dotted-line' ? (
         <div className="absolute inset-0 flex items-center justify-center p-2">
           <div className="w-full" style={{ borderBottom: `${data.strokeWidth || 2}px ${type === 'dotted-line' ? 'dashed' : 'solid'} ${data.strokeColor || '#38bdf8'}` }} />
