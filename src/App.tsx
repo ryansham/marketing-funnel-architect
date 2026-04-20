@@ -558,6 +558,13 @@ export default function App() {
     }
   };
 
+  // Confirm before replacing canvas
+  const confirmReplace = (action: () => void) => {
+    const { nodes } = useStore.getState();
+    if (nodes.length > 0 && !window.confirm('This will replace your current canvas. Continue?')) return;
+    action();
+  };
+
   // Collapsible section toggle helper
   const toggleSection = (side: 'left' | 'right', key: string) => {
     if (side === 'left') setLeftCollapsed(p => ({ ...p, [key]: !p[key] }));
@@ -783,7 +790,7 @@ export default function App() {
               icon={Layers} 
               label="Social Flow" 
               color="bg-accent" 
-              onClick={createDefaultSequence} 
+              onClick={() => confirmReplace(createDefaultSequence)} 
               theme={theme} 
             />
             {presets.map(p => (
@@ -792,7 +799,7 @@ export default function App() {
                 icon={Database} 
                 label={p.name} 
                 color="bg-slate-500" 
-                onClick={() => loadPreset(p.id)} 
+                onClick={() => confirmReplace(() => loadPreset(p.id))} 
                 theme={theme} 
               />
             ))}

@@ -454,24 +454,40 @@ export const TitleNode = memo(({ id, data, selected }: any) => {
   const updateNodeData = useStore((s) => s.updateNodeData);
   const theme          = useStore((s) => s.theme);
   const bringToFront   = useStore((s) => s.bringToFront);
-  const isConnecting   = useStore((s) => s.isConnecting);
+  // No isConnecting — title nodes don't connect to anything
 
   return (
-    <div onClick={() => bringToFront(id)} className={cn('p-2 transition-all flex flex-col min-w-[300px]', selected ? 'ring-1 ring-accent/30' : '')}>
-      <NodeHandles visible={selected || isConnecting} color="#38bdf8" />
+    <div
+      onClick={() => bringToFront(id)}
+      className={cn('p-3 transition-all flex flex-col rounded-sm', selected ? 'ring-1 ring-accent/30' : '')}
+      style={{
+        width: data.width || 480,
+        minWidth: 240,
+        minHeight: 60,
+        resize: selected ? 'both' : 'none',
+        overflow: 'hidden',
+        cursor: 'default',
+      }}
+      onMouseUp={(e) => {
+        // Capture size after CSS resize
+        const el = e.currentTarget;
+        updateNodeData(id, { width: el.offsetWidth, height: el.offsetHeight });
+      }}
+    >
+      {/* No NodeHandles — title is standalone */}
       <textarea
         className={cn('bg-transparent border-none p-0 m-0 w-full outline-none focus:ring-0 resize-none overflow-hidden font-display text-4xl font-black tracking-tighter leading-[0.85]', data.textAlign === 'center' ? 'text-center' : data.textAlign === 'right' ? 'text-right' : 'text-left', theme === 'dark' ? 'text-white' : 'text-slate-900')}
-        style={{ height: 'auto', fontFamily: data.fontFamily || 'Montserrat', letterSpacing: `${data.letterSpacing || 0}px`, lineHeight: data.lineHeight || 0.9, marginBottom: '-4px' }}
+        style={{ height: 'auto', fontFamily: data.fontFamily || 'Montserrat', letterSpacing: `${data.letterSpacing || 0}px`, lineHeight: data.lineHeight || 0.9, marginBottom: '4px' }}
         placeholder="Headline"
         value={data.label || ''}
         onChange={(e) => { updateNodeData(id, { label: e.target.value }); e.target.style.height = 'auto'; e.target.style.height = `${e.target.scrollHeight}px`; }}
         onPointerDown={(e) => e.stopPropagation()}
       />
       <textarea
-        className={cn('bg-transparent border-none p-0 m-0 w-full outline-none focus:ring-0 resize-none overflow-hidden font-sans text-lg font-bold opacity-70 leading-none', data.textAlign === 'center' ? 'text-center' : data.textAlign === 'right' ? 'text-right' : 'text-left', theme === 'dark' ? 'text-white' : 'text-slate-900')}
+        className={cn('bg-transparent border-none p-0 m-0 w-full outline-none focus:ring-0 resize-none overflow-hidden font-sans text-sm font-medium opacity-60 leading-relaxed', data.textAlign === 'center' ? 'text-center' : data.textAlign === 'right' ? 'text-right' : 'text-left', theme === 'dark' ? 'text-white' : 'text-slate-700')}
         style={{ height: 'auto', fontFamily: data.fontFamily2 || 'Roboto' }}
         placeholder="Objective..."
-        value={data.label2 || 'Objective: '}
+        value={data.label2 || ''}
         onChange={(e) => { updateNodeData(id, { label2: e.target.value }); e.target.style.height = 'auto'; e.target.style.height = `${e.target.scrollHeight}px`; }}
         onPointerDown={(e) => e.stopPropagation()}
       />
@@ -522,17 +538,42 @@ export const ImageNode = memo(({ id, data, selected }: any) => {
 export const FreeTextNode = memo(({ id, data, selected }: any) => {
   const updateNodeData = useStore((s) => s.updateNodeData);
   const theme          = useStore((s) => s.theme);
-  const isConnecting   = useStore((s) => s.isConnecting);
+  // No isConnecting — marketing notes are standalone, no connection handles
 
   return (
-    <div className={cn('p-2 transition-all group relative', selected ? 'ring-1 ring-accent/30' : '')} style={{ width: data.width || 220, height: data.height || 100, minWidth: 100 }}>
-      <NodeHandles visible={selected || isConnecting} color="#38bdf8" />
+    <div
+      className={cn(
+        'transition-all group relative rounded-sm',
+        selected ? 'ring-1 ring-accent/40' : '',
+        theme === 'dark' ? 'bg-white/3' : 'bg-black/2'
+      )}
+      style={{
+        width: data.width || 280,
+        height: data.height || 110,
+        minWidth: 120,
+        minHeight: 60,
+        resize: selected ? 'both' : 'none',
+        overflow: 'hidden',
+        cursor: 'default',
+      }}
+      onMouseUp={(e) => {
+        const el = e.currentTarget;
+        updateNodeData(id, { width: el.offsetWidth, height: el.offsetHeight });
+      }}
+    >
+      {/* No NodeHandles — marketing notes are standalone */}
       <textarea
         className={cn(
-          "flex-1 w-full h-full bg-transparent border-none outline-none resize-none text-[13px] leading-relaxed p-2 placeholder:opacity-40",
-          theme === 'dark' ? "text-white placeholder:text-white" : "text-black placeholder:text-black"
+          "w-full h-full bg-transparent border-none outline-none resize-none leading-relaxed p-3 placeholder:opacity-30",
+          theme === 'dark' ? "text-white placeholder:text-white" : "text-slate-700 placeholder:text-slate-400"
         )}
-        style={{ fontFamily: data.fontFamily || 'Dancing Script', textAlign: (data.textAlign as any) || 'left', letterSpacing: `${data.letterSpacing || 0}px`, lineHeight: data.lineHeight || 1.4, fontSize: data.fontSize ? `${data.fontSize}px` : '18px' }}
+        style={{
+          fontFamily: data.fontFamily || 'Roboto',
+          textAlign: (data.textAlign as any) || 'left',
+          letterSpacing: `${data.letterSpacing || 0}px`,
+          lineHeight: data.lineHeight || 1.6,
+          fontSize: data.fontSize ? `${data.fontSize}px` : '13px',
+        }}
         placeholder="Marketing notes..."
         value={data.note?.replace(/<[^>]*>/g, '') || ''}
         onChange={(e) => updateNodeData(id, { note: e.target.value })}
