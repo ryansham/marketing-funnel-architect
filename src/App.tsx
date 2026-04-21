@@ -1099,10 +1099,10 @@ export default function App() {
                           const [wa,em,lp,fr,rw,ti] = ['rf-wa','rf-em','rf-lp','rf-fr','rf-rw','rf-ti'].map(x=>x+z);
                           setNodes([
                             TN(ti,{x:80,y:20},'Referral Programme Funnel','Activate existing customers as brand advocates through a structured referral programme, rewarding both referrer and new customer at conversion.'),
-                            MN(wa,{x:80,y:280},'WhatsApp Referral Invite','whatsapp','Send to top 20% of customers by purchase frequency. Message: "You're one of our best customers — share your link and earn [reward] for every friend who buys." Include unique referral code.'),
+                            MN(wa,{x:80,y:280},'WhatsApp Referral Invite','whatsapp',"Send to top 20% of customers by purchase frequency. Message: \"You're one of our best customers — share your link and earn [reward] for every friend who buys.\" Include unique referral code."),
                             MN(em,{x:80,y:480},'Email Referral Invite','email','Segment: customers with 2+ purchases in last 6 months. Subject: "Earn $[X] for every friend you refer 🎁". Include referral link + social sharing buttons.'),
                             LN(lp,{x:420,y:280},'Referral Landing Page',[{id:'m1',type:'Hero',label:'Referral Offer'},{id:'m2',type:'Features',label:'How It Works'},{id:'m3',type:'Form',label:'Sign Up Form'},{id:'m4',type:'CTA',label:'Share My Link'}]),
-                            MN(fr,{x:760,y:280},'New Customer Registration','form','Capture referee details. Auto-apply referrer's code. Trigger: referrer notification via WhatsApp "Your friend just signed up! Your reward is on its way."'),
+                            MN(fr,{x:760,y:280},'New Customer Registration','form',"Capture referee details. Auto-apply referrer's code. Trigger: referrer notification via WhatsApp \"Your friend just signed up! Your reward is on its way.\""),
                             MN(rw,{x:1080,y:280},'Reward Delivery','email','Both parties receive reward confirmation. Referrer: credit/voucher + "Share again" prompt. Referee: welcome offer + onboarding sequence start.'),
                           ]);
                           setEdges([E(wa,lp,'e1'),E(em,lp,'e2'),E(lp,fr,'e3'),E(fr,rw,'e4')]);
