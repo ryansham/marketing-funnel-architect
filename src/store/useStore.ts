@@ -179,7 +179,6 @@ export const useStore = create<AppState>((set, get) => ({
   historyIndex: -1,
   theme: 'light',
   lang: (typeof localStorage !== 'undefined' ? localStorage.getItem('fa_lang') || 'en' : 'en') as 'en' | 'zh-hk' | 'zh-cn',
-  t: langDict[(typeof localStorage !== 'undefined' ? (localStorage.getItem('fa_lang') as any) || 'en' : 'en') as keyof typeof langDict] || langDict['en'],
   interactionMode: 'select',
   isConnecting: false,
   presets: JSON.parse(localStorage.getItem(PRESETS_KEY) || '[]'),
@@ -456,7 +455,7 @@ export const useStore = create<AppState>((set, get) => ({
   },
 
   setTheme: (theme: 'dark' | 'light') => set({ theme }),
-  setLang: (lang: 'en' | 'zh-hk' | 'zh-cn') => { localStorage.setItem('fa_lang', lang); set({ lang, t: langDict[lang] || langDict['en'] }); },
+  setLang: (lang: 'en' | 'zh-hk' | 'zh-cn') => { localStorage.setItem('fa_lang', lang); set({ lang }); },
 
   importCampaign: (data: { nodes: any[]; edges: any[] }) => {
     get().pushHistory();

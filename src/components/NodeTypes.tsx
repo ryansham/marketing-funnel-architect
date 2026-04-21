@@ -154,7 +154,8 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
   const hasBrand    = !!channelData?.brandLogo;
 
   const defaultBg = theme === 'dark' ? 'rgb(30, 41, 59)' : 'rgb(255, 255, 255)';
-  const brandTint = channelData ? `${channelData.color}12` : null;
+  // Use 20% opacity hex for brand tint (was 12 = ~7%, now 33 = ~20%)
+  const brandTint = channelData ? `${channelData.color}33` : null;
   const bgColor   = data.fillColor || (isDiscovery && brandTint ? brandTint : defaultBg);
 
   const activeShadow    = `0 8px 32px -4px ${accentColor}40, 0 0 0 2px ${accentColor}30`;
@@ -462,7 +463,7 @@ export const TitleNode = memo(({ id, data, selected }: any) => {
     <div
       onClick={() => bringToFront(id)}
       className={cn('relative p-3 transition-all flex flex-col rounded-sm overflow-hidden', selected ? 'ring-1 ring-accent/30' : '')}
-      style={{ width: data.width || 480, minHeight: data.height || 120, cursor: 'default' }}
+      style={{ width: data.width || 480, height: data.height || 'auto', minHeight: 120, cursor: 'default', overflow: 'hidden' }}
     >
       {/* No NodeHandles — title is standalone */}
       <textarea
@@ -617,8 +618,21 @@ export const ShapeNode = memo(({ id, data, selected }: any) => {
   const theme          = useStore((s) => s.theme);
   const bringToFront   = useStore((s) => s.bringToFront);
   const sendToBack     = useStore((s) => s.sendToBack);
-  const isConnecting   = useStore((s) => s.isConnecting);
+  // No isConnecting — shapes are decorative, no connections
   const type = data.shapeType || 'square';
+
+  const onResizeDrag = (e: React.PointerEvent) => {
+    e.stopPropagation(); e.preventDefault();
+    const sx = e.clientX, sy = e.clientY;
+    const sw = data.width || 100, sh = data.height || 100;
+    const onMove = (ev: PointerEvent) => updateNodeData(id, {
+      width: Math.max(20, sw + (ev.clientX - sx)),
+      height: Math.max(20, sh + (ev.clientY - sy)),
+    });
+    const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  };
 
   return (
     <div
@@ -626,12 +640,9 @@ export const ShapeNode = memo(({ id, data, selected }: any) => {
       onClick={() => bringToFront(id)}
       style={{ width: data.width || 100, height: data.height || 100, transform: `rotate(${data.rotation || 0}deg)` }}
     >
-      {(selected || isConnecting) && (
+      {selected && (
         <>
-          <Handle type="target"  position={Position.Left}   className="!bg-accent !border-bg !w-2 !h-2" />
-          <Handle type="target"  position={Position.Top}    className="!bg-accent !border-bg !w-2 !h-2" />
-          <Handle type="source"  position={Position.Bottom} className="!bg-accent !border-bg !w-2 !h-2" />
-          <Handle type="source"  position={Position.Right}  className="!bg-accent !border-bg !w-2 !h-2" />
+          {/* No connection handles for shapes — decorative only */}
           <div className={cn('absolute -top-10 left-1/2 -translate-x-1/2 flex items-center gap-1 p-1 rounded-lg shadow-xl z-50 border', theme === 'dark' ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200')}>
             <button onClick={() => bringToFront(id)} className={cn('p-1.5 rounded transition-colors', theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-50 text-slate-600')} title="Bring to Front"><LucideIcons.ArrowUpNarrowWide size={12} /></button>
             <button onClick={() => sendToBack(id)} className={cn('p-1.5 rounded transition-colors', theme === 'dark' ? 'hover:bg-white/10 text-white' : 'hover:bg-slate-50 text-slate-600')} title="Send to Back"><LucideIcons.ArrowDownNarrowWide size={12} /></button>
@@ -679,6 +690,19 @@ export const ShapeNode = memo(({ id, data, selected }: any) => {
               {data.label}
             </div>
           )}
+        </div>
+      )}
+      {/* Resize handle — bottom-right, no rotation applied */}
+      {selected && (type !== 'line' && type !== 'dotted-line') && (
+        <div
+          className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize flex items-end justify-end p-0.5 z-50"
+          style={{ transform: `rotate(${-(data.rotation || 0)}deg)` }}
+          onPointerDown={onResizeDrag}
+          onClick={e => e.stopPropagation()}
+        >
+          <svg width="10" height="10" viewBox="0 0 10 10" className="text-accent opacity-70">
+            <path d="M9 1L1 9M9 5L5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
         </div>
       )}
     </div>

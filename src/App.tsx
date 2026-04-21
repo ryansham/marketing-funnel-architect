@@ -117,7 +117,8 @@ export default function App() {
   const [spawnOffset, setSpawnOffset] = React.useState(0);
   const [showMiniMap, setShowMiniMap] = React.useState(false);
   const lang = useStore((s: any) => s.lang || 'en') as 'en'|'zh-hk'|'zh-cn';
-  const t = useStore((s: any) => s.t) as typeof import('../store/useStore').langDict['en'];
+  // t derived from lang — React will re-render when lang changes in store
+  const t = (langDict[lang] || langDict['en']) as typeof langDict['en'];
   const setLanguage = (l: 'en'|'zh-hk'|'zh-cn') => useStore.getState().setLang(l);
   const [leftCollapsed, setLeftCollapsed] = React.useState<Record<string,boolean>>({});
   const [showSearch, setShowSearch] = React.useState(false);
@@ -462,12 +463,10 @@ export default function App() {
       // ── Ads layer (col 0) ─────────────────────────────────────────────────────
       { id: metaId, type: 'marketing', position: { x: X0, y: CY - 80 },
         data: { label: 'Meta Ads', type: 'discovery', primaryChannel: 'facebook',
-          volume: 15000, ctr: 3.2, cpc: 0.45,
-          note: 'Target interest-based audiences on Facebook & Instagram. Use carousel ads showcasing the campaign offer to drive awareness and clicks to the landing page.' } },
+          note: '' } },
       { id: googleId, type: 'marketing', position: { x: X0, y: CY + 120 },
         data: { label: 'Google Ads', type: 'discovery', primaryChannel: 'google-ads',
-          volume: 12000, ctr: 4.1, cpc: 0.62,
-          note: 'Capture high-intent users via Search & Display. Bid on branded and category keywords to intercept users actively searching for relevant offers.' } },
+          note: '' } },
 
       // ── Landing Page (col 1, center) ──────────────────────────────────────────
       { id: landingId, type: 'landing', position: { x: X1, y: CY - 150 },
@@ -488,11 +487,11 @@ export default function App() {
       { id: emailId, type: 'marketing', position: { x: X3, y: CY - 120 },
         data: { label: 'Email Confirmation', type: 'discovery', primaryChannel: 'email',
           volume: 0, ctr: 0, cpc: 0,
-          note: 'Send an automated confirmation email immediately after registration. Include: campaign details, redemption instructions, event date/location, and a QR code for offline check-in.' } },
+                    note: '' } },
       { id: waId, type: 'marketing', position: { x: X3, y: CY + 80 },
         data: { label: 'WhatsApp Confirmation', type: 'discovery', primaryChannel: 'whatsapp',
           volume: 0, ctr: 0, cpc: 0,
-          note: 'Follow up via WhatsApp for higher open rates (>90%). Send a reminder 24h before the event with the redemption QR code. Consider a chatbot flow for FAQs and upsell.' } },
+                    note: '' } },
     ];
 
     const newEdges: any[] = [
@@ -1330,7 +1329,8 @@ function ShortcutsHelper({ theme }: { theme: 'dark' | 'light' }) {
 }
 
 function Footer({ theme }: { theme: 'dark' | 'light' }) {
-  const t = useStore((s: any) => s.t) as any || {};
+  const _lang = useStore((s: any) => s.lang || 'en');
+  const t = (langDict[_lang as keyof typeof langDict] || langDict['en']) as any;
   return (
     <footer className={cn(
       "col-span-full border-t flex items-center px-6 gap-4 text-[10px] text-text-dim opacity-40",
