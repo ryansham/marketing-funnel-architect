@@ -1,49 +1,3 @@
-// Sidebar uses translations from parent App's langDict
-// Import inline to avoid circular deps
-const sidebarLangDict = {
-  en: {
-    history: 'History',
-    architectMode: 'Architect Mode', architectModeDesc: {st.architectModeDesc},
-    channelSelection: 'Channel Selection', nodeNameTitle: 'Node Name / Title',
-    styleConfig: 'Style Configuration', visualAppearance: 'Visual Appearance',
-    fillColor: 'Fill Color', borderColor: 'Border Color', borderThickness: 'Border Thickness',
-    pageConfig: 'Page Configuration', pageTemplate: 'Page Template',
-    mediaToolkit: 'Media Toolkit', addModule: 'Add Module',
-    typographyLayout: 'Typography & Layout', alignment: 'Alignment',
-    titleSize: 'Title Size', fontFamily: 'Font Family',
-    spacingControls: 'Spacing Controls', letterSpacing: 'Letter Spacing', lineHeight: 'Line Height',
-    addNote: 'Add a note...', expandNote: 'Expand Note', collapseNote: 'Collapse Note',
-    group: 'Group', ungroup: 'Ungroup',
-  },
-  'zh-hk': {
-    history: '歷史記錄',
-    architectMode: '設計師模式', architectModeDesc: '選取畫布上的任何元素以設定其屬性。',
-    channelSelection: '頻道選擇', nodeNameTitle: '節點名稱／標題',
-    styleConfig: '樣式設定', visualAppearance: '視覺外觀',
-    fillColor: '填充顏色', borderColor: '邊框顏色', borderThickness: '邊框粗細',
-    pageConfig: '頁面設定', pageTemplate: '頁面模板',
-    mediaToolkit: '媒體工具包', addModule: '新增模組',
-    typographyLayout: '字型與排版', alignment: '對齊方式',
-    titleSize: '標題大小', fontFamily: '字型',
-    spacingControls: '間距控制', letterSpacing: '字距', lineHeight: '行距',
-    addNote: '新增備注…', expandNote: '展開備注', collapseNote: '收起備注',
-    group: '組合', ungroup: '取消組合',
-  },
-  'zh-cn': {
-    history: '历史记录',
-    architectMode: '设计师模式', architectModeDesc: '选择画布上的任何元素以配置其属性。',
-    channelSelection: '渠道选择', nodeNameTitle: '节点名称／标题',
-    styleConfig: '样式配置', visualAppearance: '视觉外观',
-    fillColor: '填充颜色', borderColor: '边框颜色', borderThickness: '边框粗细',
-    pageConfig: '页面配置', pageTemplate: '页面模板',
-    mediaToolkit: '媒体工具包', addModule: '添加模块',
-    typographyLayout: '字体与排版', alignment: '对齐方式',
-    titleSize: '标题大小', fontFamily: '字体',
-    spacingControls: '间距控制', letterSpacing: '字距', lineHeight: '行距',
-    addNote: '添加备注…', expandNote: '展开备注', collapseNote: '收起备注',
-    group: '组合', ungroup: '取消组合',
-  },
-} as const;
 import React from 'react';
 import { useStore } from '../store/useStore';
 import * as LucideIcons from 'lucide-react';
@@ -101,8 +55,7 @@ export default function Sidebar() {
     importCampaign
   } = useStore();
   
-  const lang = useStore((s) => (s as any).lang || 'en') as 'en' | 'zh-hk' | 'zh-cn';
-  const st = sidebarLangDict[lang] || sidebarLangDict['en'];
+  const st = useStore((s: any) => s.t) as any || {};
   const selectedNode = nodes.find(n => n.id === selectedNodeId);
 
   const handleExportJSON = () => {

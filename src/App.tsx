@@ -1,158 +1,5 @@
 /* Copyright@ryansham.martechtalks_ryansham.com */
-// ─── i18n ─────────────────────────────────────────────────────────────────────
-const langDict = {
-  en: {
-    // App
-    appName: 'Marketing Funnel Architect',
-    // Left sidebar sections
-    discoveryChannels: 'Discovery Channels',
-    landingPage: 'Landing Page',
-    toolsVisuals: 'Tools & Visuals',
-    marketingPresets: 'Marketing Presets',
-    // Left sidebar items
-    ads: 'Ads', googleAds: 'Google Ads', metaAds: 'Meta Ads', others: 'Others',
-    email: 'Email', forms: 'Forms', social: 'Social', outdoorMedia: 'Outdoor Media',
-    largeTitle: 'Large Title', marketingNotes: 'Marketing Notes', imageLogo: 'Image/Logo',
-    square: 'Square', circle: 'Circle', line: 'Line', dotted: 'Dotted',
-    browseTemplates: 'Browse Templates', saveAsPreset: '{t.saveAsPreset}',
-    // Header
-    importJSON: 'Import JSON', exportLabel: 'Export',
-    // Toolbar tooltips
-    selectionTool: 'Selection Tool', handTool: 'Hand Tool',
-    autoArrange: 'Auto Arrange', toggleMiniMap: 'Toggle MiniMap',
-    searchNodes: 'Search nodes',
-    // Right sidebar
-    history: 'History', group: 'Group', ungroup: 'Ungroup',
-    architectMode: 'Architect Mode', architectModeDesc: 'Select any component on the canvas to configure its O2O properties.',
-    channelSelection: 'Channel Selection', nodeNameTitle: 'Node Name / Title',
-    styleConfig: 'Style Configuration', visualAppearance: 'Visual Appearance',
-    fillColor: 'Fill Color', borderColor: 'Border Color', borderThickness: 'Border Thickness',
-    pageConfig: 'Page Configuration', pageTemplate: 'Page Template',
-    mediaToolkit: 'Media Toolkit', addModule: 'Add Module',
-    typographyLayout: 'Typography & Layout', alignment: 'Alignment',
-    titleSize: 'Title Size', fontFamily: 'Font Family',
-    spacingControls: 'Spacing Controls', letterSpacing: 'Letter Spacing', lineHeight: 'Line Height',
-    livePreview: 'Live Preview',
-    // Search
-    searchPlaceholder: 'Search nodes... (Esc to close)',
-    searchStart: 'Start typing to find a node on the canvas',
-    searchNone: 'No nodes found',
-    // Tour
-    tourSkip: 'Skip tour', tourNext: 'Next', tourDone: 'Done!',
-    tourStep1Title: 'Drag cards onto the canvas', tourStep1Body: 'Pick any channel from the left panel (Ads, Email, Social…) and drag it onto the canvas.',
-    tourStep2Title: 'Connect cards', tourStep2Body: 'Hover a card to reveal its blue handles, then drag from a handle to another card to create a connection.',
-    tourStep3Title: 'Configure each step', tourStep3Body: 'Click any card to open its settings on the right — add notes, change channel, and style your funnel.',
-    tourStep4Title: 'Export your funnel', tourStep4Body: 'Use the Export button (top-right) to download as PNG, PDF or share as JSON.',
-    // Templates modal
-    chooseTemplate: 'Choose a Campaign Template',
-    chooseTemplateDesc: 'Each template comes with a full funnel flow, descriptions and strategic notes on every card',
-    viewTemplate: 'View template →', startBlank: '→ Start with blank canvas', cancel: 'Cancel',
-    // Confirm
-    confirmReplace: 'This will replace your current canvas. Continue?',
-    // Footer
-    footerCopyright: '©ryansham.martechtalks',
-    // Context menu
-    canvasActions: 'Canvas Actions', paste: 'Paste', fitView: 'Fit View',
-    edgeActions: 'Edge Actions', removeConnection: 'Remove Connection',
-    configureChannel: 'Configure Channel', resetContentStack: 'Reset Content Stack',
-    selectionExport: 'Selection Export', downloadPNG: 'Download Selection as PNG',
-    copyPNG: 'Copy Selection as PNG', copySelection: 'Copy Selection',
-    duplicate: 'Duplicate', deleteSelection: 'Delete Selection',
-    bringToTop: 'Bring to Top', sendToBack: 'Send to Back',
-    // Note placeholder
-    addNote: 'Add a note...',
-  },
-  'zh-hk': {
-    appName: 'Marketing Funnel Architect',
-    discoveryChannels: '探索頻道', landingPage: '著陸頁',
-    toolsVisuals: '工具與視覺', marketingPresets: '行銷模板',
-    ads: '廣告', googleAds: 'Google 廣告', metaAds: 'Meta 廣告', others: '其他',
-    email: '電郵', forms: '表單', social: '社交媒體', outdoorMedia: '戶外媒體',
-    largeTitle: '大標題', marketingNotes: '行銷備注', imageLogo: '圖片/標誌',
-    square: '方形', circle: '圓形', line: '直線', dotted: '虛線',
-    browseTemplates: '瀏覽模板', saveAsPreset: '+ 儲存為自訂模板',
-    importJSON: '匯入 JSON', exportLabel: '匯出',
-    selectionTool: '選擇工具', handTool: '手形工具',
-    autoArrange: '自動排列', toggleMiniMap: '切換小地圖', searchNodes: '搜尋節點',
-    history: '歷史記錄', group: '組合', ungroup: '取消組合',
-    architectMode: '設計師模式', architectModeDesc: '選取畫布上的任何元素以設定其屬性。',
-    channelSelection: '頻道選擇', nodeNameTitle: '節點名稱／標題',
-    styleConfig: '樣式設定', visualAppearance: '視覺外觀',
-    fillColor: '填充顏色', borderColor: '邊框顏色', borderThickness: '邊框粗細',
-    pageConfig: '頁面設定', pageTemplate: '頁面模板',
-    mediaToolkit: '媒體工具包', addModule: '新增模組',
-    typographyLayout: '字型與排版', alignment: '對齊方式',
-    titleSize: '標題大小', fontFamily: '字型',
-    spacingControls: '間距控制', letterSpacing: '字距', lineHeight: '行距',
-    livePreview: '即時預覽',
-    searchPlaceholder: '搜尋節點… (Esc 關閉)',
-    searchStart: '輸入以尋找畫布上的節點',
-    searchNone: '找不到節點',
-    tourSkip: '略過導覽', tourNext: '下一步', tourDone: '完成！',
-    tourStep1Title: '拖曳卡片到畫布', tourStep1Body: '從左側面板選擇頻道（廣告、電郵、社交媒體等），拖曳到畫布上。',
-    tourStep2Title: '連結卡片', tourStep2Body: '將滑鼠移到卡片上以顯示藍色連接點，從連接點拖曳到另一張卡片以建立連結。',
-    tourStep3Title: '設定每個步驟', tourStep3Body: '點擊任何卡片以在右側開啟其設定 — 新增備注、更換頻道並設計漏斗。',
-    tourStep4Title: '匯出你的漏斗', tourStep4Body: '使用右上角的「匯出」按鈕以 PNG、PDF 下載或以 JSON 分享。',
-    chooseTemplate: '選擇活動模板',
-    chooseTemplateDesc: '每個模板均附有完整漏斗流程、說明及每張卡片的策略備注',
-    viewTemplate: '查看模板 →', startBlank: '→ 從空白畫布開始', cancel: '取消',
-    confirmReplace: '此操作將取代目前畫布，確定繼續？',
-    footerCopyright: '©ryansham.martechtalks',
-    canvasActions: '畫布操作', paste: '貼上', fitView: '全圖顯示',
-    edgeActions: '連線操作', removeConnection: '移除連線',
-    configureChannel: '設定頻道', resetContentStack: '重設內容堆疊',
-    selectionExport: '選取範圍匯出', downloadPNG: '以 PNG 下載選取範圍',
-    copyPNG: '複製選取範圍為 PNG', copySelection: '複製選取',
-    duplicate: '複製', deleteSelection: '刪除選取',
-    bringToTop: '移至最前', sendToBack: '移至最後',
-    addNote: '新增備注…',
-  },
-  'zh-cn': {
-    appName: 'Marketing Funnel Architect',
-    discoveryChannels: '探索渠道', landingPage: '落地页',
-    toolsVisuals: '工具与视觉', marketingPresets: '营销模板',
-    ads: '广告', googleAds: 'Google 广告', metaAds: 'Meta 广告', others: '其他',
-    email: '邮件', forms: '表单', social: '社交媒体', outdoorMedia: '户外媒体',
-    largeTitle: '大标题', marketingNotes: '营销备注', imageLogo: '图片/标志',
-    square: '方形', circle: '圆形', line: '直线', dotted: '虚线',
-    browseTemplates: '浏览模板', saveAsPreset: '+ 保存为自定义模板',
-    importJSON: '导入 JSON', exportLabel: '导出',
-    selectionTool: '选择工具', handTool: '手形工具',
-    autoArrange: '自动排列', toggleMiniMap: '切换小地图', searchNodes: '搜索节点',
-    history: '历史记录', group: '组合', ungroup: '取消组合',
-    architectMode: '设计师模式', architectModeDesc: '选择画布上的任何元素以配置其属性。',
-    channelSelection: '渠道选择', nodeNameTitle: '节点名称／标题',
-    styleConfig: '样式配置', visualAppearance: '视觉外观',
-    fillColor: '填充颜色', borderColor: '边框颜色', borderThickness: '边框粗细',
-    pageConfig: '页面配置', pageTemplate: '页面模板',
-    mediaToolkit: '媒体工具包', addModule: '添加模块',
-    typographyLayout: '字体与排版', alignment: '对齐方式',
-    titleSize: '标题大小', fontFamily: '字体',
-    spacingControls: '间距控制', letterSpacing: '字距', lineHeight: '行距',
-    livePreview: '实时预览',
-    searchPlaceholder: '搜索节点… (Esc 关闭)',
-    searchStart: '输入以查找画布上的节点',
-    searchNone: '未找到节点',
-    tourSkip: '跳过导览', tourNext: '下一步', tourDone: '完成！',
-    tourStep1Title: '拖拽卡片到画布', tourStep1Body: '从左侧面板选择渠道（广告、邮件、社交媒体等），拖拽到画布上。',
-    tourStep2Title: '连接卡片', tourStep2Body: '将鼠标移到卡片上显示蓝色连接点，从连接点拖拽到另一张卡片建立连接。',
-    tourStep3Title: '配置每个步骤', tourStep3Body: '点击任意卡片在右侧打开设置 — 添加备注、更换渠道并设计漏斗。',
-    tourStep4Title: '导出你的漏斗', tourStep4Body: '使用右上角的"导出"按钮以 PNG、PDF 下载或以 JSON 分享。',
-    chooseTemplate: '选择活动模板',
-    chooseTemplateDesc: '每个模板均附有完整漏斗流程、说明及每张卡片的策略备注',
-    viewTemplate: '查看模板 →', startBlank: '→ 从空白画布开始', cancel: '取消',
-    confirmReplace: '此操作将替换当前画布，确定继续？',
-    footerCopyright: '©ryansham.martechtalks',
-    canvasActions: '画布操作', paste: '粘贴', fitView: '全图显示',
-    edgeActions: '连线操作', removeConnection: '移除连线',
-    configureChannel: '配置渠道', resetContentStack: '重置内容堆叠',
-    selectionExport: '选区导出', downloadPNG: '以 PNG 下载选区',
-    copyPNG: '复制选区为 PNG', copySelection: '复制选区',
-    duplicate: '复制', deleteSelection: '删除选区',
-    bringToTop: '移至最前', sendToBack: '移至最后',
-    addNote: '添加备注…',
-  },
-} as const;
+// langDict moved to useStore.ts
 
 
 import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
@@ -269,9 +116,9 @@ export default function App() {
 
   const [spawnOffset, setSpawnOffset] = React.useState(0);
   const [showMiniMap, setShowMiniMap] = React.useState(false);
-  const [lang, setLang] = React.useState<'en'|'zh-hk'|'zh-cn'>(() => (localStorage.getItem('fa_lang') as any) || 'en');
-  const t = React.useMemo(() => langDict[lang], [lang]);
-  const setLanguage = (l: 'en'|'zh-hk'|'zh-cn') => { setLang(l); useStore.getState().setLang(l); };
+  const lang = useStore((s: any) => s.lang || 'en') as 'en'|'zh-hk'|'zh-cn';
+  const t = useStore((s: any) => s.t) as typeof import('../store/useStore').langDict['en'];
+  const setLanguage = (l: 'en'|'zh-hk'|'zh-cn') => useStore.getState().setLang(l);
   const [leftCollapsed, setLeftCollapsed] = React.useState<Record<string,boolean>>({});
   const [showSearch, setShowSearch] = React.useState(false);
   const [searchQuery, setSearchQuery] = React.useState('');
@@ -1289,6 +1136,7 @@ export default function App() {
             onClick={() => setMenu(null)} 
             {...menu} 
             theme={theme} 
+            t={t}
             handleExportSelection={handleExportSelection}
           />}
         </ReactFlow>
@@ -1482,13 +1330,14 @@ function ShortcutsHelper({ theme }: { theme: 'dark' | 'light' }) {
 }
 
 function Footer({ theme }: { theme: 'dark' | 'light' }) {
+  const t = useStore((s: any) => s.t) as any || {};
   return (
     <footer className={cn(
       "col-span-full border-t flex items-center px-6 gap-4 text-[10px] text-text-dim opacity-40",
       theme === 'dark' ? "bg-sidebar border-border" : "bg-white border-slate-200"
     )}>
       <span className="font-black tracking-widest uppercase">Marketing Funnel Architect</span>
-      <span>©ryansham.martechtalks</span>
+      <span>{t.footerCopyright || '©ryansham.martechtalks'}</span>
     </footer>
   );
 }
@@ -1500,6 +1349,7 @@ function ContextMenu({
   left, 
   onClick,
   theme,
+  t,
   handleExportSelection
 }: any) {
   const { 
