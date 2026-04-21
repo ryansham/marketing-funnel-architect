@@ -1091,8 +1091,8 @@ export default function App() {
                             TN(ti,{x:80,y:20},'Webinar & Education Funnel','Drive registrations for an online masterclass using paid search and email, reduce no-shows with WhatsApp reminders, and convert attendees post-event.'),
                             MN(ga,{x:80,y:280},'Google Search Ads','google-ads','Target: "[Topic] training", "[Topic] course", "how to [outcome]". Landing page = registration. Remarketing list for past site visitors. Set max CPA target bid.'),
                             MN(em,{x:80,y:480},'Email Invitation','email','Send to existing list segments. Subject: "Free Masterclass: [Outcome in 60 mins]". Personalise by industry. 3-touch sequence: invite → reminder → last-chance.'),
-                            LN(lp,{x:420,y:280},'Webinar Registration Page',[{id:'m1',type:'Hero',label:'Event Details'},{id:'m2',type:'Features',label:'What You'll Learn'},{id:'m3',type:'Form',label:'Register Now'},{id:'m4',type:'CTA',label:'Add to Calendar'}]),
-                            MN(wa,{x:760,y:180},'WhatsApp Reminders','whatsapp','T-24h: "See you tomorrow! Here's your join link 👇". T-1h: "Starting soon — click to join". T+0: Live link drop. T+24h: Recording link + next steps.'),
+                            LN(lp,{x:420,y:280},'Webinar Registration Page',[{id:'m1',type:'Hero',label:'Event Details'},{id:'m2',type:'Features',label:"What You'll Learn"},{id:'m3',type:'Form',label:'Register Now'},{id:'m4',type:'CTA',label:'Add to Calendar'}]),
+                            MN(wa,{x:760,y:180},'WhatsApp Reminders','whatsapp',"T-24h: \"See you tomorrow! Here's your join link 👇\". T-1h: \"Starting soon — click to join\". T+0: Live link drop. T+24h: Recording link + next steps."),
                             MN(ev,{x:760,y:380},'Post-Webinar Follow-up','email','Within 1h: Recording + slides link. Day 2: Key takeaways summary. Day 4: Related resource / offer. Day 7: 1:1 consultation CTA for hot leads.'),
                           ]);
                           setEdges([E(ga,lp,'e1'),E(em,lp,'e2'),E(lp,wa,'e3'),E(lp,ev,'e4')]);
