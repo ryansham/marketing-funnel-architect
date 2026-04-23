@@ -12,7 +12,7 @@ const langDict = {
     // Left sidebar items
     ads: 'Ads', googleAds: 'Google Ads', metaAds: 'Meta Ads', others: 'Others',
     email: 'Email', forms: 'Forms', social: 'Social', outdoorMedia: 'Outdoor Media',
-    largeTitle: 'Large Title', marketingNotes: 'Marketing Notes', imageLogo: 'Image/Logo',
+    headline: 'Headline', paragraph: 'Paragraph', imageLogo: 'Image/Logo',
     square: 'Square', circle: 'Circle', line: 'Line', dotted: 'Dotted',
     browseTemplates: 'Browse Templates', saveAsPreset: '+ Save current as preset',
     // Header
@@ -68,7 +68,7 @@ const langDict = {
     toolsVisuals: '工具與視覺', marketingPresets: '行銷模板',
     ads: '廣告', googleAds: 'Google 廣告', metaAds: 'Meta 廣告', others: '其他',
     email: '電郵', forms: '表單', social: '社交媒體', outdoorMedia: '戶外媒體',
-    largeTitle: '大標題', marketingNotes: '行銷備注', imageLogo: '圖片/標誌',
+    headline: '標題', paragraph: '段落文字', imageLogo: '圖片/標誌',
     square: '方形', circle: '圓形', line: '直線', dotted: '虛線',
     browseTemplates: '瀏覽模板', saveAsPreset: '+ 儲存為自訂模板',
     importJSON: '匯入 JSON', exportLabel: '匯出',
@@ -113,7 +113,7 @@ const langDict = {
     toolsVisuals: '工具与视觉', marketingPresets: '营销模板',
     ads: '广告', googleAds: 'Google 广告', metaAds: 'Meta 广告', others: '其他',
     email: '邮件', forms: '表单', social: '社交媒体', outdoorMedia: '户外媒体',
-    largeTitle: '大标题', marketingNotes: '营销备注', imageLogo: '图片/标志',
+    headline: '标题', paragraph: '段落文字', imageLogo: '图片/标志',
     square: '方形', circle: '圆形', line: '直线', dotted: '虚线',
     browseTemplates: '浏览模板', saveAsPreset: '+ 保存为自定义模板',
     importJSON: '导入 JSON', exportLabel: '导出',
@@ -172,7 +172,7 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 
 import { useStore } from './store/useStore';
-import { MarketingNode, LandingPageNode, StickyNoteNode, FreeTextNode, TitleNode, ImageNode, ShapeNode, GroupNode, CustomEdge } from './components/NodeTypes';
+import { MarketingNode, LandingPageNode, StickyNoteNode, TitleNode, ParagraphNode, ImageNode, ShapeNode, GroupNode, CustomEdge } from './components/NodeTypes';
 import Sidebar from './components/Sidebar';
 import MockupPreview from './components/MockupPreview';
 import { NodeType, SocialChannel, ShapeType } from './types';
@@ -218,8 +218,8 @@ const nodeTypes = {
   marketing: MarketingNode,
   landing: LandingPageNode,
   sticky: StickyNoteNode,
-  text: FreeTextNode,
   title: TitleNode,
+  paragraph: ParagraphNode,
   image: ImageNode,
   shape: ShapeNode,
   group: GroupNode
@@ -611,8 +611,8 @@ export default function App() {
     const newNodes: any[] = [
       // ── Title card (top-left, left-aligned) ──────────────────────────────────
       { id: titleId, type: 'title', position: { x: X0, y: 40 },
-        data: { label: 'Marketing Funnel', label2: 'Objective: Drive O2O conversions by attracting online audiences and guiding them to complete an offline action — from digital touchpoints to real-world engagement.',
-          type: 'title', fontFamily: 'Montserrat', textAlign: 'left', volume: 0, ctr: 0, cpc: 0 } },
+        data: { label: 'Marketing Funnel', type: 'title', fontFamily: 'Montserrat', textAlign: 'left', fontSize: 42 } },
+      { id: 'n-obj-'+t, type: 'paragraph', position: { x: X0, y: 110 }, data: { label: 'Objective: Drive O2O conversions by attracting online audiences and guiding them to complete an offline action — from digital touchpoints to real-world engagement.', type: 'paragraph', fontFamily: 'Roboto', fontSize: 13, width: 620, height: 50 } },
 
       // ── Ads layer (col 0) ─────────────────────────────────────────────────────
       { id: metaId, type: 'marketing', position: { x: X0, y: CY - 80 },
@@ -920,8 +920,8 @@ export default function App() {
           </button>
           {!leftCollapsed['tools'] && <>
           <div className="space-y-2">
-            <ToolkitItem icon={Heading1} label={t.largeTitle} color="bg-accent" onClick={() => addNode('title', 'Headline', 'title', { titleType: 'h1', textAlign: 'center', label2: 'Objective: ' })} theme={theme} />
-            <ToolkitItem icon={Type} label={t.marketingNotes} color="bg-slate-400" onClick={() => addNode('text', 'Marketing notes...', 'text', { fontFamily: 'Roboto', fontSize: 18 })} theme={theme} />
+            <ToolkitItem icon={Heading1} label={t.headline} color="bg-accent" onClick={() => addNode('title', 'Headline', 'title', { titleType: 'h1', textAlign: 'left', fontSize: 42 })} theme={theme} />
+            <ToolkitItem icon={Type} label={t.paragraph} color="bg-slate-400" onClick={() => addNode('paragraph', '', 'paragraph', { fontFamily: 'Roboto', fontSize: 14, width: 320, height: 100 })} theme={theme} />
             <ToolkitItem icon={Image} label={t.imageLogo} color="bg-white" onClick={() => addNode('image', '', 'image')} theme={theme} />
           </div>
           
@@ -1035,27 +1035,44 @@ export default function App() {
 
           {showMiniMap && <MiniMap
             nodeStrokeWidth={3}
-            zoomable
-            pannable
             nodeColor={(n) => {
               if (n.type === 'marketing') {
                 const ch = n.data?.primaryChannel;
-                if (ch === 'facebook') return '#1877F2';
-                if (ch === 'instagram') return '#E4405F';
-                if (ch === 'whatsapp') return '#25D366';
-                if (ch === 'youtube') return '#FF0000';
-                if (ch === 'email') return '#6366f1';
-                return '#3b82f6';
+                if (ch === 'facebook')   return '#1877F2';
+                if (ch === 'instagram')  return '#E4405F';
+                if (ch === 'whatsapp')   return '#25D366';
+                if (ch === 'google-ads') return '#4285F4';
+                if (ch === 'youtube')    return '#FF0000';
+                if (ch === 'email')      return '#6366f1';
+                if (ch === 'outdoor')    return '#f97316';
+                if (ch === 'tiktok')     return '#444';
+                if (ch === 'wechat')     return '#07C160';
+                return '#38bdf8';
               }
-              if (n.type === 'landing') return '#a855f7';
-              if (n.type === 'title') return '#64748b';
-              if (n.type === 'text') return '#94a3b8';
-              if (n.type === 'shape') return '#38bdf8';
-              return '#cbd5e1';
+              if (n.type === 'landing')   return '#a855f7';
+              if (n.type === 'title')     return '#f59e0b';
+              if (n.type === 'paragraph') return '#94a3b8';
+              if (n.type === 'shape')     return '#38bdf8';
+              return 'rgba(148,163,184,0.4)';
             }}
-            maskColor={theme === 'dark' ? 'rgba(2,6,23,0.7)' : 'rgba(248,250,252,0.7)'}
+            nodeStrokeColor={(n) => {
+              if (n.type === 'landing')   return '#a855f7';
+              if (n.type === 'title')     return '#f59e0b';
+              return 'transparent';
+            }}
+            zoomable
+            pannable
+            style={{
+              width: 280,
+              height: 180,
+              borderRadius: 12,
+              border: theme === 'dark' ? '1px solid rgba(255,255,255,0.08)' : '1px solid rgba(0,0,0,0.08)',
+              boxShadow: '0 8px 32px rgba(0,0,0,0.2)',
+              overflow: 'hidden',
+            }}
+            maskColor={theme === 'dark' ? 'rgba(2,6,23,0.6)' : 'rgba(248,250,252,0.6)'}
             className={cn(
-              "!rounded-xl !border !shadow-2xl",
+              "!rounded-2xl !border-2 !shadow-2xl",
               theme === 'dark' ? "!bg-slate-900 !border-white/10" : "!bg-white !border-slate-200"
             )}
           />}
@@ -1199,7 +1216,8 @@ export default function App() {
                         setShowTemplates(false);
                         const z = Date.now();
                         const E = (src: string, tgt: string, eid: string) => ({id:eid,source:src,target:tgt,sourceHandle:'right',targetHandle:'left',type:'custom'});
-                        const TN = (id: string, pos: any, label: string, obj: string) => ({id,type:'title',position:pos,data:{label,label2:'Objective: '+obj,type:'title',fontFamily:'Montserrat',textAlign:'left'}});
+                        const TN = (id: string, pos: any, label: string, obj: string) => ({id,type:'title',position:pos,data:{label,type:'title',fontFamily:'Montserrat',textAlign:'left',fontSize:42}});
+        const PN = (id: string, pos: any, text: string) => ({id,type:'paragraph',position:pos,data:{label:text,type:'paragraph',fontFamily:'Roboto',fontSize:13,width:520,height:50}});
                         const MN = (id: string, pos: any, label: string, ch: string, note: string) => ({id,type:'marketing',position:pos,data:{label,type:'discovery',primaryChannel:ch,note}});
                         const LN = (id: string, pos: any, label: string, mods: any[]) => ({id,type:'landing',position:pos,data:{label,type:'owned',pageType:'Static Page',mockupModules:mods}});
                         const TX = (id: string, pos: any, note: string) => ({id,type:'text',position:pos,data:{label:'Note',note,type:'text',fontFamily:'Roboto',fontSize:13,width:240,height:90}});
@@ -1209,7 +1227,8 @@ export default function App() {
                         } else if (tpl.key === 'leadgen') {
                           const [ga,me,lp,fr,em,ti] = ['lg-ga','lg-me','lg-lp','lg-fr','lg-em','lg-ti'].map(x=>x+z);
                           setNodes([
-                            TN(ti,{x:80,y:20},'Lead Generation Funnel','Capture high-intent leads from paid search and social, convert them on a dedicated landing page, and nurture with automated email sequences.'),
+                            TN(ti,{x:80,y:20},'Lead Generation Funnel',''),
+                            PN('lg-pn'+z,{x:80,y:95},'Capture high-intent leads from paid search and social, convert them on a dedicated landing page, and nurture with automated email sequences.'),
                             MN(ga,{x:80,y:280},'Google Search Ads','google-ads','Target users actively searching for your solution. Use SKAG (single keyword ad groups) for precise match and quality score optimisation. Bid on competitor names for steal opportunities.'),
                             MN(me,{x:80,y:480},'Meta Lead Ads','facebook','Run native lead-gen forms on Facebook & Instagram to reduce friction. Audience: custom lookalikes from existing customer list + interest-based cold audiences.'),
                             LN(lp,{x:420,y:180},'Lead Capture Page',[{id:'m1',type:'Hero',label:'Value Proposition'},{id:'m2',type:'Features',label:'Key Benefits'},{id:'m3',type:'Form',label:'Lead Form'},{id:'m4',type:'CTA',label:'Submit CTA'}]),
@@ -1220,7 +1239,8 @@ export default function App() {
                         } else if (tpl.key === 'loyalty') {
                           const [wa,em,lp,qr,ti] = ['ly-wa','ly-em','ly-lp','ly-qr','ly-ti'].map(x=>x+z);
                           setNodes([
-                            TN(ti,{x:80,y:20},'Loyalty Re-engagement Campaign','Reactivate lapsed members using personalised WhatsApp and email outreach, directing them to a rewards page for exclusive offline redemption.'),
+                            TN(ti,{x:80,y:20},'Loyalty Re-engagement Campaign',''),
+                            PN('ly-pn'+z,{x:80,y:95},'Reactivate lapsed members using personalised WhatsApp and email outreach, directing them to a rewards page for exclusive offline redemption.'),
                             MN(wa,{x:80,y:280},'WhatsApp Re-engagement','whatsapp','Send personalised "We miss you" message with first-name merge tag. Include exclusive returning-member offer (e.g. double points this weekend). Send Friday 6pm for weekend redemption uplift.'),
                             MN(em,{x:80,y:480},'Re-engagement Email','email','Subject: "[Name], your reward expires soon 🎁". Segment by: last purchase > 90 days. A/B test: discount vs. experience-based reward offer.'),
                             LN(lp,{x:420,y:280},'Member Rewards Page',[{id:'m1',type:'Hero',label:'Exclusive Offer Banner'},{id:'m2',type:'Subscription',label:'Member Club'},{id:'m3',type:'Redemption',label:'Reward Offer'},{id:'m4',type:'QR',label:'Redemption QR'}]),
@@ -1230,7 +1250,8 @@ export default function App() {
                         } else if (tpl.key === 'product') {
                           const [ig,tt,lp,wa,em,ti] = ['pl-ig','pl-tt','pl-lp','pl-wa','pl-em','pl-ti'].map(x=>x+z);
                           setNodes([
-                            TN(ti,{x:80,y:20},'New Product Launch Funnel','Build pre-launch hype on social, convert interest on a product landing page, then activate purchasers via WhatsApp for advocacy and repeat purchase.'),
+                            TN(ti,{x:80,y:20},'New Product Launch Funnel',''),
+                            PN('pl-pn'+z,{x:80,y:95},'Build pre-launch hype on social, convert interest on a product landing page, then activate purchasers via WhatsApp for advocacy and repeat purchase.'),
                             MN(ig,{x:80,y:280},'Instagram Awareness','instagram','Teaser content: "Something big is coming". Use countdown stickers in Stories. Collaborate with 3–5 micro-influencers (10k–100k) for authentic reach. Swipe-up link to waitlist page.'),
                             MN(tt,{x:80,y:480},'TikTok Launch Video','tiktok','Product demo / unboxing video. Hook in first 2 seconds. Challenge hashtag for UGC. Paid boost on top-performing organic content (whitelist creator account for ads).'),
                             LN(lp,{x:420,y:280},'Product Launch Page',[{id:'m1',type:'Hero',label:'Hero Banner'},{id:'m2',type:'Features',label:'Product Benefits'},{id:'m3',type:'CTA',label:'Buy Now / Pre-order'},{id:'m4',type:'Subscription',label:'Notify Me'}]),
@@ -1241,7 +1262,8 @@ export default function App() {
                         } else if (tpl.key === 'webinar') {
                           const [ga,em,lp,wa,ev,ti] = ['wb-ga','wb-em','wb-lp','wb-wa','wb-ev','wb-ti'].map(x=>x+z);
                           setNodes([
-                            TN(ti,{x:80,y:20},'Webinar & Education Funnel','Drive registrations for an online masterclass using paid search and email, reduce no-shows with WhatsApp reminders, and convert attendees post-event.'),
+                            TN(ti,{x:80,y:20},'Webinar & Education Funnel',''),
+                            PN('wb-pn'+z,{x:80,y:95},'Drive registrations for an online masterclass using paid search and email, reduce no-shows with WhatsApp reminders, and convert attendees post-event.'),
                             MN(ga,{x:80,y:280},'Google Search Ads','google-ads','Target: "[Topic] training", "[Topic] course", "how to [outcome]". Landing page = registration. Remarketing list for past site visitors. Set max CPA target bid.'),
                             MN(em,{x:80,y:480},'Email Invitation','email','Send to existing list segments. Subject: "Free Masterclass: [Outcome in 60 mins]". Personalise by industry. 3-touch sequence: invite → reminder → last-chance.'),
                             LN(lp,{x:420,y:280},'Webinar Registration Page',[{id:'m1',type:'Hero',label:'Event Details'},{id:'m2',type:'Features',label:"What You'll Learn"},{id:'m3',type:'Form',label:'Register Now'},{id:'m4',type:'CTA',label:'Add to Calendar'}]),
@@ -1252,7 +1274,8 @@ export default function App() {
                         } else if (tpl.key === 'referral') {
                           const [wa,em,lp,fr,rw,ti] = ['rf-wa','rf-em','rf-lp','rf-fr','rf-rw','rf-ti'].map(x=>x+z);
                           setNodes([
-                            TN(ti,{x:80,y:20},'Referral Programme Funnel','Activate existing customers as brand advocates through a structured referral programme, rewarding both referrer and new customer at conversion.'),
+                            TN(ti,{x:80,y:20},'Referral Programme Funnel',''),
+                            PN('rf-pn'+z,{x:80,y:95},'Activate existing customers as brand advocates through a structured referral programme, rewarding both referrer and new customer at conversion.'),
                             MN(wa,{x:80,y:280},'WhatsApp Referral Invite','whatsapp',"Send to top 20% of customers by purchase frequency. Message: \"You're one of our best customers — share your link and earn [reward] for every friend who buys.\" Include unique referral code."),
                             MN(em,{x:80,y:480},'Email Referral Invite','email','Segment: customers with 2+ purchases in last 6 months. Subject: "Earn $[X] for every friend you refer 🎁". Include referral link + social sharing buttons.'),
                             LN(lp,{x:420,y:280},'Referral Landing Page',[{id:'m1',type:'Hero',label:'Referral Offer'},{id:'m2',type:'Features',label:'How It Works'},{id:'m3',type:'Form',label:'Sign Up Form'},{id:'m4',type:'CTA',label:'Share My Link'}]),

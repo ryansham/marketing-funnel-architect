@@ -237,21 +237,7 @@ export const MarketingNode = memo(({ id, data, selected }: any) => {
           </div>
         </div>
 
-        {/* Note — always visible and editable on both discovery + non-discovery cards */}
-        <textarea
-          className={cn(
-            'w-full border rounded p-1.5 mt-1.5 text-[10px] outline-none focus:border-accent/40 resize-none transition-all font-medium leading-relaxed',
-            isDiscovery ? 'text-center' : '',
-            theme === 'dark' ? 'bg-black/20 border-white/5 text-white/80 placeholder:text-white/20 focus:bg-black/30' : 'bg-slate-50 border-slate-200 text-slate-700 placeholder:text-slate-400 focus:bg-white',
-          )}
-          style={{ minHeight: 36, height: 'auto', maxHeight: 120 }}
-          placeholder="Add a note..."
-          rows={2}
-          value={data.note || ''}
-          onChange={(e) => { updateNodeData(id, { note: e.target.value }); e.target.style.height = 'auto'; e.target.style.height = Math.min(120, e.target.scrollHeight) + 'px'; }}
-          onMouseDown={(e) => e.stopPropagation()}
-          onPointerDown={(e) => e.stopPropagation()}
-        />
+
       </div>
     </div>
   );
@@ -465,21 +451,13 @@ export const TitleNode = memo(({ id, data, selected }: any) => {
       className={cn('relative p-3 transition-all flex flex-col rounded-sm overflow-hidden', selected ? 'ring-1 ring-accent/30' : '')}
       style={{ width: data.width || 480, height: data.height || 'auto', minHeight: 120, cursor: 'default', overflow: 'hidden' }}
     >
-      {/* No NodeHandles — title is standalone */}
+      {/* No NodeHandles — headline is standalone */}
       <textarea
-        className={cn('bg-transparent border-none p-0 m-0 w-full outline-none focus:ring-0 resize-none overflow-hidden font-display text-4xl font-black tracking-tighter leading-[0.85]', data.textAlign === 'center' ? 'text-center' : data.textAlign === 'right' ? 'text-right' : 'text-left', theme === 'dark' ? 'text-white' : 'text-slate-900')}
-        style={{ height: 'auto', fontFamily: data.fontFamily || 'Montserrat', letterSpacing: `${data.letterSpacing || 0}px`, lineHeight: data.lineHeight || 0.9, marginBottom: '4px' }}
+        className={cn('bg-transparent border-none p-0 m-0 w-full outline-none focus:ring-0 resize-none overflow-hidden font-display font-black tracking-tighter leading-tight', data.textAlign === 'center' ? 'text-center' : data.textAlign === 'right' ? 'text-right' : 'text-left', theme === 'dark' ? 'text-white' : 'text-slate-900')}
+        style={{ height: 'auto', fontFamily: data.fontFamily || 'Montserrat', letterSpacing: `${data.letterSpacing || 0}px`, lineHeight: data.lineHeight || 0.9, fontSize: data.fontSize ? `${data.fontSize}px` : '42px' }}
         placeholder="Headline"
         value={data.label || ''}
         onChange={(e) => { updateNodeData(id, { label: e.target.value }); e.target.style.height = 'auto'; e.target.style.height = `${e.target.scrollHeight}px`; }}
-        onPointerDown={(e) => e.stopPropagation()}
-      />
-      <textarea
-        className={cn('bg-transparent border-none p-0 m-0 w-full outline-none focus:ring-0 resize-none overflow-hidden font-sans text-sm font-medium opacity-60 leading-relaxed', data.textAlign === 'center' ? 'text-center' : data.textAlign === 'right' ? 'text-right' : 'text-left', theme === 'dark' ? 'text-white' : 'text-slate-700')}
-        style={{ height: 'auto', fontFamily: data.fontFamily2 || 'Roboto' }}
-        placeholder="Objective..."
-        value={data.label2 || ''}
-        onChange={(e) => { updateNodeData(id, { label2: e.target.value }); e.target.style.height = 'auto'; e.target.style.height = `${e.target.scrollHeight}px`; }}
         onPointerDown={(e) => e.stopPropagation()}
       />
       {selected && <TitleFloatingToolbar id={id} data={data} />}
@@ -498,6 +476,73 @@ export const TitleNode = memo(({ id, data, selected }: any) => {
     </div>
   );
 });
+
+
+// ─── ParagraphNode ─────────────────────────────────────────────────────────────
+
+export const ParagraphNode = memo(({ id, data, selected }: any) => {
+  const updateNodeData = useStore((s) => s.updateNodeData);
+  const theme          = useStore((s) => s.theme);
+  const bringToFront   = useStore((s) => s.bringToFront);
+  const [isResizing, setIsResizing] = React.useState(false);
+
+  const onResizeDragStart = (e: React.PointerEvent) => {
+    e.stopPropagation(); e.preventDefault();
+    const sx = e.clientX, sy = e.clientY;
+    const sw = data.width || 320, sh = data.height || 100;
+    setIsResizing(true);
+    const onMove = (ev: PointerEvent) => updateNodeData(id, {
+      width: Math.max(160, sw + (ev.clientX - sx)),
+      height: Math.max(48, sh + (ev.clientY - sy)),
+    });
+    const onUp = () => { setIsResizing(false); window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); };
+    window.addEventListener('pointermove', onMove);
+    window.addEventListener('pointerup', onUp);
+  };
+
+  return (
+    <div
+      onClick={() => bringToFront(id)}
+      className={cn('relative rounded-sm overflow-hidden transition-all', selected ? 'ring-1 ring-accent/30' : '')}
+      style={{ width: data.width || 320, height: data.height || 100, minWidth: 160, minHeight: 48 }}
+    >
+      {/* No handles — paragraph is standalone */}
+      <textarea
+        className={cn(
+          'w-full h-full bg-transparent border-none outline-none resize-none leading-relaxed p-2 placeholder:opacity-30',
+          data.textAlign === 'center' ? 'text-center' : data.textAlign === 'right' ? 'text-right' : 'text-left',
+          theme === 'dark' ? 'text-white placeholder:text-white/30' : 'text-slate-700 placeholder:text-slate-400'
+        )}
+        style={{
+          fontFamily: data.fontFamily || 'Roboto',
+          fontSize: data.fontSize ? `${data.fontSize}px` : '14px',
+          letterSpacing: `${data.letterSpacing || 0}px`,
+          lineHeight: data.lineHeight || 1.6,
+        }}
+        placeholder="Paragraph text..."
+        value={data.label || ''}
+        onChange={(e) => updateNodeData(id, { label: e.target.value })}
+        onMouseDown={(e) => e.stopPropagation()}
+        onPointerDown={(e) => e.stopPropagation()}
+      />
+      {selected && (
+        <>
+          <FloatingToolbar id={id} data={data} />
+          <div
+            className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize flex items-end justify-end p-0.5 z-50"
+            onPointerDown={onResizeDragStart}
+            onClick={e => e.stopPropagation()}
+          >
+            <svg width="10" height="10" viewBox="0 0 10 10" className="text-accent opacity-60">
+              <path d="M9 1L1 9M9 5L5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+          </div>
+        </>
+      )}
+    </div>
+  );
+});
+ParagraphNode.displayName = 'ParagraphNode';
 
 // ─── ImageNode ─────────────────────────────────────────────────────────────────
 
@@ -536,80 +581,6 @@ export const ImageNode = memo(({ id, data, selected }: any) => {
   );
 });
 
-// ─── FreeTextNode ──────────────────────────────────────────────────────────────
-
-export const FreeTextNode = memo(({ id, data, selected }: any) => {
-  const updateNodeData = useStore((s) => s.updateNodeData);
-  const theme          = useStore((s) => s.theme);
-  const [isResizing, setIsResizing] = React.useState(false);
-
-  const onResizeDragStart = (e: React.PointerEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startW = data.width || 280;
-    const startH = data.height || 110;
-    setIsResizing(true);
-    const onMove = (ev: PointerEvent) => {
-      updateNodeData(id, {
-        width:  Math.max(120, startW + (ev.clientX - startX)),
-        height: Math.max(60,  startH + (ev.clientY - startY)),
-      });
-    };
-    const onUp = () => {
-      setIsResizing(false);
-      window.removeEventListener('pointermove', onMove);
-      window.removeEventListener('pointerup', onUp);
-    };
-    window.addEventListener('pointermove', onMove);
-    window.addEventListener('pointerup', onUp);
-  };
-
-  return (
-    <div
-      className={cn(
-        'transition-all relative rounded-sm border',
-        selected ? 'ring-1 ring-accent/40' : '',
-        theme === 'dark' ? 'bg-white/[0.03] border-white/5' : 'bg-white/80 border-slate-200'
-      )}
-      style={{ width: data.width || 280, height: data.height || 110, minWidth: 120, minHeight: 60, overflow: 'hidden' }}
-    >
-      {/* No NodeHandles — marketing notes are standalone */}
-      <textarea
-        className={cn(
-          "w-full h-full bg-transparent border-none outline-none resize-none leading-relaxed p-3 placeholder:opacity-30",
-          theme === 'dark' ? "text-white placeholder:text-white/30" : "text-slate-700 placeholder:text-slate-400"
-        )}
-        style={{
-          fontFamily: data.fontFamily || 'Roboto',
-          textAlign: (data.textAlign as any) || 'left',
-          letterSpacing: `${data.letterSpacing || 0}px`,
-          lineHeight: data.lineHeight || 1.6,
-          fontSize: data.fontSize ? `${data.fontSize}px` : '13px',
-        }}
-        placeholder="Marketing notes..."
-        value={data.note?.replace(/<[^>]*>/g, '') || ''}
-        onChange={(e) => updateNodeData(id, { note: e.target.value })}
-        onMouseDown={(e) => e.stopPropagation()}
-        onPointerDown={(e) => e.stopPropagation()}
-      />
-      {/* Resize handle */}
-      {selected && (
-        <div
-          className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize flex items-end justify-end p-0.5"
-          onPointerDown={onResizeDragStart}
-          onClick={e => e.stopPropagation()}
-        >
-          <svg width="10" height="10" viewBox="0 0 10 10" className="text-accent opacity-60">
-            <path d="M9 1L1 9M9 5L5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
-          </svg>
-        </div>
-      )}
-      {selected && <FloatingToolbar id={id} data={data} />}
-    </div>
-  );
-});
 
 // ─── ShapeNode ─────────────────────────────────────────────────────────────────
 
@@ -692,7 +663,43 @@ export const ShapeNode = memo(({ id, data, selected }: any) => {
           )}
         </div>
       )}
-      {/* Resize handle — bottom-right, no rotation applied */}
+      {/* Resize handle for lines — right edge drag extends length */}
+      {selected && (type === 'line' || type === 'dotted-line') && (
+        <div
+          className="absolute top-1/2 right-0 -translate-y-1/2 w-6 h-10 cursor-ew-resize flex items-center justify-center z-50"
+          onPointerDown={(e) => {
+            e.stopPropagation(); e.preventDefault();
+            const sx = e.clientX;
+            const sw = data.width || 100;
+            const onMove = (ev: PointerEvent) => updateNodeData(id, { width: Math.max(20, sw + (ev.clientX - sx)) });
+            const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); };
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp);
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="w-1 h-6 rounded-full bg-accent opacity-70" />
+        </div>
+      )}
+      {/* Thickness control for lines — top edge drag */}
+      {selected && (type === 'line' || type === 'dotted-line') && (
+        <div
+          className="absolute top-0 left-1/2 -translate-x-1/2 h-4 w-10 cursor-ns-resize flex items-start justify-center z-50"
+          onPointerDown={(e) => {
+            e.stopPropagation(); e.preventDefault();
+            const sy = e.clientY;
+            const sw = data.strokeWidth || 2;
+            const onMove = (ev: PointerEvent) => updateNodeData(id, { strokeWidth: Math.max(1, Math.min(20, sw - (ev.clientY - sy) * 0.2)) });
+            const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); };
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp);
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          <div className="w-6 h-1 rounded-full bg-accent opacity-50 mt-1" />
+        </div>
+      )}
+
       {selected && (type !== 'line' && type !== 'dotted-line') && (
         <div
           className="absolute bottom-0 right-0 w-5 h-5 cursor-se-resize flex items-end justify-end p-0.5 z-50"
@@ -702,6 +709,25 @@ export const ShapeNode = memo(({ id, data, selected }: any) => {
         >
           <svg width="10" height="10" viewBox="0 0 10 10" className="text-accent opacity-70">
             <path d="M9 1L1 9M9 5L5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+          </svg>
+        </div>
+      )}
+      {/* Line/dotted-line: resize width via right-edge handle */}
+      {selected && (type === 'line' || type === 'dotted-line') && (
+        <div
+          className="absolute top-1/2 right-0 -translate-y-1/2 w-4 h-8 cursor-e-resize flex items-center justify-end pr-0.5 z-50"
+          onPointerDown={(e) => {
+            e.stopPropagation(); e.preventDefault();
+            const sx = e.clientX, sw = data.width || 200;
+            const onMove = (ev: PointerEvent) => updateNodeData(id, { width: Math.max(40, sw + (ev.clientX - sx)) });
+            const onUp = () => { window.removeEventListener('pointermove', onMove); window.removeEventListener('pointerup', onUp); };
+            window.addEventListener('pointermove', onMove);
+            window.addEventListener('pointerup', onUp);
+          }}
+          onClick={e => e.stopPropagation()}
+        >
+          <svg width="6" height="14" viewBox="0 0 6 14" className="text-accent opacity-70">
+            <path d="M3 1v12M1 3l2-2 2 2M1 11l2 2 2-2" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
           </svg>
         </div>
       )}
