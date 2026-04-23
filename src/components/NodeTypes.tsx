@@ -926,7 +926,6 @@ export const CustomEdge = memo(({
 MarketingNode.displayName   = 'MarketingNode';
 LandingPageNode.displayName = 'LandingPageNode';
 StickyNoteNode.displayName  = 'StickyNoteNode';
-FreeTextNode.displayName    = 'FreeTextNode';
 TitleNode.displayName       = 'TitleNode';
 ImageNode.displayName       = 'ImageNode';
 ShapeNode.displayName       = 'ShapeNode';
