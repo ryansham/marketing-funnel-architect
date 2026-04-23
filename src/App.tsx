@@ -1,4 +1,4 @@
-/* Copyright@ryansham.martechtalks_ryansham.com */
+/* Copyright@ryansham.martechtalks_ryansham.com | v2.1 */
 // ─── i18n ─────────────────────────────────────────────────────────────────────
 const langDict = {
   en: {
