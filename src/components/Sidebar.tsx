@@ -137,8 +137,9 @@ export default function Sidebar() {
   }
 
   const isLandingNode = selectedNode.type === 'landing';
-  const isTextNode = selectedNode.type === 'text';
-  const isTitleNode = selectedNode.type === 'title';
+  const isTextNode = selectedNode.type === 'text' || selectedNode.type === 'paragraph';
+  const isTitleNode = selectedNode.type === 'title' || selectedNode.type === 'paragraph';
+  const isParagraphNode = selectedNode.type === 'paragraph';
   const isImageNode = selectedNode.type === 'image';
   const isShapedOrMarketing = selectedNode.type === 'shape' || selectedNode.type === 'marketing';
 
